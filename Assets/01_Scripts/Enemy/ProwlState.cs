@@ -12,12 +12,15 @@ public class ProwlState : IEnemyState
 
     public void Execute(EnemyBase enemy)
     {
-        if(enemy.playerDistance < enemy.detectDistance)
+        if (enemy.playerDistance < enemy.detectDistance)
         {
-            enemy.ChangeState(EnemyStates.Chase);
+            if (enemy.CheckChase())
+            {
+                enemy.ChangeState(EnemyStates.Chase);
+            }
         }
 
-        if(enemy.agent.remainingDistance < 0.1f)
+        if (enemy.agent.remainingDistance < 0.1f)
         {
             enemy.ChangeState(EnemyStates.Idle);
         }

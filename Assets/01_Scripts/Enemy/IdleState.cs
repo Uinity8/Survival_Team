@@ -12,10 +12,12 @@ public class IdleState : IEnemyState
 
     public void Execute(EnemyBase enemy)
     {
-        if (enemy.playerDistance < enemy.detectDistance)
+        if (enemy.playerDistance <= enemy.detectDistance)
         {
-            enemy.ChangeState(EnemyStates.Chase);
-            return;
+            if (enemy.CheckChase())
+            {
+                enemy.ChangeState(EnemyStates.Chase);
+            }
         }
 
         if (!isWaiting)
