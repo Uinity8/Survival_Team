@@ -2,7 +2,7 @@
     "name": "PlayerInputActions",
     "maps": [
         {
-            "name": "Player",
+            "name": "LocoMotion",
             "id": "dab4f2cd-d2ab-4794-8c39-6517c73bb894",
             "actions": [
                 {
@@ -10,15 +10,6 @@
                     "type": "Value",
                     "id": "80621946-6435-482a-b7e4-8b96cb41f164",
                     "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "Look",
-                    "type": "Value",
-                    "id": "734d6334-29c7-4f84-88be-c416b0692624",
-                    "expectedControlType": "Delta",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -33,27 +24,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Dash",
+                    "name": "Sprint",
                     "type": "Button",
                     "id": "5775b680-34e8-4fe1-9612-0d1db82d52b4",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Pause",
-                    "type": "Button",
-                    "id": "622e7f1e-8680-41d3-897c-2bc1735731e5",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Attack",
-                    "type": "Button",
-                    "id": "e793fcb1-a4d4-405e-bf42-e7b70d4fd845",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -67,15 +40,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "Zoom",
-                    "type": "Value",
-                    "id": "de595694-129d-42db-9ae1-62a060bb33fe",
-                    "expectedControlType": "Axis",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -136,17 +100,6 @@
                 },
                 {
                     "name": "",
-                    "id": "72e0f396-2ddd-4e00-b772-6b464186a0ee",
-                    "path": "<Mouse>/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "3130d022-da1a-483f-b8ba-6a84060ecf80",
                     "path": "<Keyboard>/space",
                     "interactions": "",
@@ -163,29 +116,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Dash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "d26552fb-e441-4bc0-a6b7-ff597a6a2119",
-                    "path": "<Keyboard>/escape",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Pause",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6b1ab2d7-742f-4116-8eca-74ff0da8324c",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Attack",
+                    "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -199,10 +130,84 @@
                     "action": "Interaction",
                     "isComposite": false,
                     "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Shorcut",
+            "id": "6ce1f8ae-ecd9-44bf-aaaf-a5bbd31772b6",
+            "actions": [
+                {
+                    "name": "Inventory",
+                    "type": "Button",
+                    "id": "792deb1c-b64c-4802-8070-c5a3cfd0e69b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
+                    "name": "Pause",
+                    "type": "Button",
+                    "id": "f95ecef1-8d4b-48c8-96a3-45330515def9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "0fd5642e-3948-4086-a090-95dfd9561ada",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Inventory",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ec0a7617-48b0-4ef2-85ea-17dec4161e02",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Camera",
+            "id": "17a871be-e1c1-42ea-8d4f-a4bd99700cca",
+            "actions": [
+                {
+                    "name": "Look",
+                    "type": "Value",
+                    "id": "a1beb4f3-6051-4f38-9972-f92efc044550",
+                    "expectedControlType": "Delta",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Zoom",
+                    "type": "Value",
+                    "id": "1689ce52-6c9f-42bc-9d3f-36fcf6c09bc2",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
                     "name": "1D Axis",
-                    "id": "ec52687c-c70e-433b-a721-3dc2bf348589",
+                    "id": "70aac6d0-eaa1-4359-9845-2a36cd12b015",
                     "path": "1DAxis",
                     "interactions": "",
                     "processors": "",
@@ -213,7 +218,7 @@
                 },
                 {
                     "name": "negative",
-                    "id": "8539f130-193e-4083-9b2c-b4cd5bf1e346",
+                    "id": "eafae256-6351-4d22-947f-0143ce9087f1",
                     "path": "<Mouse>/scroll/down",
                     "interactions": "",
                     "processors": "",
@@ -224,7 +229,7 @@
                 },
                 {
                     "name": "positive",
-                    "id": "3ef311bf-2d34-4473-af0e-28500132f163",
+                    "id": "1c6cf00c-151d-4801-8c61-5a381885a2a8",
                     "path": "<Mouse>/scroll/up",
                     "interactions": "",
                     "processors": "",
@@ -232,6 +237,45 @@
                     "action": "Zoom",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "8cd9329a-bdac-4e8b-8e92-3536b6f7a4ba",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Combat",
+            "id": "c6cba22e-8989-4536-a816-d4ef4fb572a7",
+            "actions": [
+                {
+                    "name": "Attack",
+                    "type": "Button",
+                    "id": "3c4a128b-f37f-448c-a896-5bae7c898fbc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "9527421c-a9b3-4bf6-ae64-4b6796f3020f",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -746,34 +790,6 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "Shorcut",
-            "id": "6ce1f8ae-ecd9-44bf-aaaf-a5bbd31772b6",
-            "actions": [
-                {
-                    "name": "Inventory",
-                    "type": "Button",
-                    "id": "792deb1c-b64c-4802-8070-c5a3cfd0e69b",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "0fd5642e-3948-4086-a090-95dfd9561ada",
-                    "path": "<Keyboard>/tab",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

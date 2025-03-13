@@ -110,11 +110,12 @@ namespace _01_Scripts.Third_Person_Controller
         [field: Tooltip("이 moveAmount 값 이상에서만 빠른 정지 애니메이션을 재생합니다.")]
         public float runToStopThreshhold = 0.4f; // 빠른 정지를 위한 최소 이동량
 
-        [Header("Ground Check Settings")] [Tooltip("지면 감지 구체의 반지름")] [SerializeField]
-        float groundCheckRadius = 0.2f; // 땅 감지 범위 (구체 반지름)
+        [Header("Ground Check Settings")] [Tooltip("지면 체크 시 오프셋 (불규칙한 지형에서 유용)")] [SerializeField]
+        float groundCheckOffset = -0.14f;
 
-        [Tooltip("플레이어의 루트 위치와 지면 감지 구체 사이의 오프셋")] [SerializeField]
-        Vector3 groundCheckOffset = new Vector3(0f, 0.15f, 0.07f); // 땅 감지 오프셋
+        [Tooltip("지면 체크에 사용될 원의 반지름 (CharacterController의 반지름과 일치해야 함)")] [SerializeField]
+        float groundCheckRadius = 0.28f;
+
 
         [Tooltip("땅으로 간주되어야 할 모든 레이어")] public LayerMask groundLayer = 1; // 땅으로 간주되는 레이어들
         public LayerMask LedgeLayer = 0; // 가장자리 레이어
@@ -160,11 +161,11 @@ namespace _01_Scripts.Third_Person_Controller
         float headHeightThreshold = .75f; // 머리 감지 높이 임계값
         float sprintModeTimer = 0; // 스프린트 모드 유지 시간
 
-// 땅 감지 영역의 오프셋 (Getter/Setter)
-        public Vector3 GroundCheckOffset
+        // 땅 감지 영역의 오프셋 (Getter/Setter)
+        public float GroundCheckOffset
         {
-            get { return groundCheckOffset; } // 현재 땅 감지 오프셋 반환
-            set { groundCheckOffset = value; } // 새로운 땅 감지 오프셋 설정
+            get => groundCheckOffset; // 현재 땅 감지 오프셋 반환
+            set => groundCheckOffset = value; // 새로운 땅 감지 오프셋 설정
         }
 
         // 땅 감지 구체의 반지름 값을 반환 (읽기 전용)
@@ -203,8 +204,7 @@ namespace _01_Scripts.Third_Person_Controller
             controllerDefaultHeight = characterController.height;
             controllerDefaultYOffset = characterController.center.y;
             footIk = GetComponent<FootIK>();
-            if (groundLayer != (groundLayer | LedgeLayer))
-                groundLayer += LedgeLayer;
+            groundLayer |= LedgeLayer; //Ledge는 그라운드에 포함 되어야함
         }
 
         private void OnAnimatorIK(int layerIndex)
@@ -257,32 +257,13 @@ namespace _01_Scripts.Third_Person_Controller
             }
         }
 
-        private void Update()
-        {
-            // 사용자 입력을 받는 함수 호출
-            GetInput();
-
-            // 모바일 플랫폼(Android 또는 iOS)에서만 실행
-#if UNITY_ANDROID || UNITY_IOS
-    // 기본 상태를 달리기 상태로 설정한 경우
-    if (setDefaultStateToRunning)
-    {
-        // moveAmount가 1(최대 이동량)일 경우 스프린트 모드 타이머 증가
-        if (moveAmount == 1)
-            sprintModeTimer += Time.deltaTime; // 경과 시간을 누적
-        else
-            sprintModeTimer = 0; // 이동량이 1이 아닐 경우 타이머 초기화
-    }
-#endif
-        }
-
 
         public override void HandleUpdate()
         {
             // 이동이 제한되었거나 루트 모션이 활성화된 경우, ySpeed를 줄이고 종료
             if (preventLocomotion || UseRootMotion)
             {
-                ySpeed = Gravity / 4; // 중력 감소
+                ySpeed = Gravity / 4; // 중력만 적용 하고 리턴
                 return;
             }
 
@@ -298,10 +279,12 @@ namespace _01_Scripts.Third_Person_Controller
             // 땅에 닿았으며 이전에 공중에 있었다면 착지 처리
             if (isGrounded && !wasGroundedPreviously)
             {
-                if (ySpeed < Gravity) // 착지 속도가 일정 값 이상이라면 착지 처리 진행
+                if (ySpeed < Gravity) // 착지 속도가 일정 값 이상이라면 착지 처리 진행 << 수정해야할듯
                 {
-                    playerController.OnLand?.Invoke(Mathf.Clamp(Mathf.Abs(ySpeed) * 0.0007f, 0.0f, 0.01f),
-                        1f); // 착지 이벤트 호출
+                    playerController.OnLand?.Invoke(
+                        Mathf.Clamp(Mathf.Abs(ySpeed) * 0.0007f, 0.0f,
+                            0.01f), //카메라 쉐이크(amount, duration) << SignalManager로 변경예정
+                        1f);
                     animator.SetFloat(AnimatorParameters.FallAmount,
                         Mathf.Clamp(Mathf.Abs(ySpeed) * 0.06f, 0.6f, 1f)); // 애니메이션 변수 설정
                     StartCoroutine(DoLocomotionAction("Landing", true)); // 착지 애니메이션 재생
@@ -312,14 +295,8 @@ namespace _01_Scripts.Third_Person_Controller
                 }
             }
 
-            // 초기 속도 설정
+            // 속도 초기화
             velocity = Vector3.zero;
-
-            // 점프 키를 누르면 점프 실행
-            if (inputManager.JumpKeyDown)
-            {
-                VerticalJump();
-            }
 
             if (isGrounded) // 캐릭터가 지면에 있을 경우
             {
@@ -329,37 +306,35 @@ namespace _01_Scripts.Third_Person_Controller
                 // 기본 상태가 달리기로 설정되었는지 확인하고 변경
                 setDefaultStateToRunning =
                     inputManager.ToggleRun ? !setDefaultStateToRunning : setDefaultStateToRunning;
-
+                
                 // 속도 값을 설정 (달리기/걷기 여부)
-                float normalizedSpeed = setDefaultStateToRunning ? 1 : .2f;
-
-                // 스프린트 여부에 따른 속도 설정
-                if (enableSprint)
-                    normalizedSpeed = (inputManager.SprintKey || sprintModeTimer > 2f) ? 1.5f : normalizedSpeed;
-                else
-                    normalizedSpeed = (inputManager.SprintKey || sprintModeTimer > 2f) ? 1f : normalizedSpeed;
+                float targetSpeed = setDefaultStateToRunning ? runSpeed : walkSpeed;
+                
+                if(inputManager.SprintKey || sprintModeTimer > 2f)
+                    targetSpeed = enableSprint ? sprintSpeed : runSpeed;
 
                 // 속도 계산 (걷기, 달리기, 스프린트)
-                moveSpeed = Mathf.Approximately(normalizedSpeed, 0.2f) ? walkSpeed : runSpeed;
+                moveSpeed = targetSpeed;
 
-                var curSpeedDir = currentSpeed;
-                curSpeedDir.y = 0;
+                var curSpeedDir = currentSpeed; //현재 이동방향은 현재 스피드?
+                curSpeedDir.y = 0; //수직값은 제거
 
-                var sprintDir = Vector3.Dot(curSpeedDir.normalized, transform.forward); // 현재 방향성 계산
-                sprintDir = sprintDir > sprintDirectionThreshold ? sprintDir : 0;
+                var sprintDir = Vector3.Dot(curSpeedDir.normalized, transform.forward); // 앞쪽 방향과 얼마나 일치하는지 
+                sprintDir = sprintDir > sprintDirectionThreshold
+                    ? sprintDir
+                    : 0; //정해지 기준(기본값 0.9) 보다 일치하면 sprintDir유지 아니면 초기화
 
-                moveSpeed = Mathf.Approximately(normalizedSpeed, 1.5f)
-                    ? Mathf.Lerp(moveSpeed, sprintSpeed, Mathf.Clamp01(sprintDir))
-                    : moveSpeed;
+                moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, Mathf.Clamp01(sprintDir));
 
-                var currentRunSpeed = runSpeed;
+
+                var currentRunSpeed = runSpeed; //현재 달리기 속도는 뛰기 속도
 
                 // 앉기 값(crouchVal)에 따른 이동 속도 감소
-                if (Mathf.Approximately(crouchVal, 1))
-                    moveSpeed *= .6f; // 앉아있을 때 속도 감소
+                if (Mathf.Approximately(crouchVal, 1)) 
+                    moveSpeed *= .6f; // 앉아있을 때 60% 속도
                 else if (useMultiDirectionalAnimation)
                 {
-                    moveSpeed *= speedMultiplier; // 다방향 애니메이션 사용 중일 경우 속도 가중치 적용
+                    moveSpeed *= speedMultiplier; // 다방향 애니메이션 사용 중일 경우 속도 가중치 적용(기본값 0.8)
                     currentRunSpeed *= speedMultiplier;
                 }
 
@@ -380,7 +355,7 @@ namespace _01_Scripts.Third_Person_Controller
                     if (!hitData.ForwardHitFound && !Physics.Raycast(transform.position + Vector3.up * 0.1f,
                             transform.forward, 0.5f, environmentScanner.ObstacleLayer))
                     {
-                        StartCoroutine(DoLocomotionAction("Jump Down", _useRootmotionMovement: true,
+                        StartCoroutine(DoLocomotionAction("Jump Down", _useRootMotionMovement: true,
                             _targetRotation: Quaternion.LookRotation(MoveDir)));
                         IsOnLedge = false;
                         animator.SetBool(AnimatorParameters.IsGrounded, isGrounded = false);
@@ -388,24 +363,24 @@ namespace _01_Scripts.Third_Person_Controller
                     }
                 }
 
-                // 현재 속도가 0이 아닐 경우 이동 속도 조정
-                if (velocity.magnitude != 0)
-                    currentSpeed = Vector3.MoveTowards(currentSpeed, velocity, acceleration * Time.deltaTime);
-                else
-                    currentSpeed = Vector3.MoveTowards(currentSpeed, Vector3.zero, deceleration * Time.deltaTime);
+                //  velocity > 0 ? 가속 : 감속
+                currentSpeed = Vector3.MoveTowards(currentSpeed, velocity,
+                    (velocity != Vector3.zero ? acceleration : deceleration) * Time.deltaTime);
 
                 // 캐릭터 실제 이동 속도 계산
                 var characterVelocity = characterController.velocity;
                 characterVelocity.y = 0;
 
+                //전방속도
                 float forwardSpeed = Vector3.Dot(characterVelocity, transform.forward);
                 animator.SetFloat(AnimatorParameters.MoveAmount, forwardSpeed / currentRunSpeed, 0.2f, Time.deltaTime);
 
+                //좌위 속도
                 float strafeSpeed = Vector3.Dot(characterVelocity, transform.right);
                 animator.SetFloat(AnimatorParameters.StrafeAmount, strafeSpeed / currentRunSpeed, 0.2f, Time.deltaTime);
 
-                // 빠른 정지 애니메이션 재생
-                if (playQuickStopAnimation && ((MoveAmount > runToStopThreshhold && velocity.magnitude == 0) ||
+                // 급정지 애니메이션 재생
+                if (playQuickStopAnimation && ((MoveAmount > runToStopThreshhold && velocity == Vector3.zero) ||
                                                (forwardSpeed / currentRunSpeed < 0.1f &&
                                                 MoveAmount > runToStopThreshhold)) &&
                     animator.GetFloat(AnimatorParameters.IdleType) < 0.2f)
@@ -413,17 +388,17 @@ namespace _01_Scripts.Third_Person_Controller
                     currentSpeed = Vector3.zero;
                     animator.SetBool(AnimatorParameters.TurnBackMirror, strafeSpeed > 0.03f);
                     animator.SetFloat(AnimatorParameters.RunToStopAmount, MoveAmount);
-                    StartCoroutine(DoLocomotionAction("Run To Stop", _useRootmotionMovement: false, crossFadeTime: 0.3f,
+                    StartCoroutine(DoLocomotionAction("Run To Stop", _useRootMotionMovement: false, crossFadeTime: 0.3f,
                         onComplete: () => { animator.SetFloat(AnimatorParameters.MoveAmount, 0); }));
                 }
                 else if (playQuickTurnAnimation)
                 {
-                    Turnback();
+                    TurnBack();
                 }
             }
             else // 공중 상태일 때
             {
-                ySpeed = Mathf.Clamp(ySpeed + Gravity * Time.deltaTime, -30,
+                ySpeed = Mathf.Clamp(ySpeed + Gravity * Time.deltaTime, Gravity,
                     Mathf.Abs(Gravity) * timeToJump); // ySpeed 조정
             }
 
@@ -507,21 +482,20 @@ namespace _01_Scripts.Third_Person_Controller
             // 방향 벡터 설정: 오른쪽, 전방, 위쪽 방향
             Vector3 right = transform.right * 0.3f, forward = transform.forward * 0.3f, up = Vector3.up * 0.2f;
 
-            // 캡슐 충돌 체크: 오른쪽 아래와 오른쪽 위를 검사하여 지면과 닿는지 확인
-            hitCount += Physics.CheckCapsule(transform.position - right + up, transform.position - right - up, 0.1f,
-                groundLayer)
-                ? 1
-                : 0;
-            hitCount += Physics.CheckCapsule(transform.position + right + up, transform.position + right - up, 0.1f,
-                groundLayer)
-                ? 1
-                : 0;
+            // 전방 후방 검사
+            hitCount += Physics.CheckCapsule(transform.position + forward + up,
+                transform.position + forward - up,
+                0.1f, groundLayer) ? 1 : 0;
+            hitCount +=  Physics.CheckCapsule(transform.position - forward + up,
+                transform.position - forward - up,
+                0.1f, groundLayer)? 1 : 0;
+            
 
-            // 캡슐 충돌 체크: 발 앞쪽(오른쪽 발, 왼쪽 발) 검사
-            bool rightFootHit = Physics.CheckCapsule(transform.position + forward + up, transform.position + forward - up,
-                0.1f, groundLayer);
-            bool leftFootHit = Physics.CheckCapsule(transform.position - forward + up, transform.position - forward - up,
-                0.1f, groundLayer);
+            // 캡슐 충돌 체크: 발 앞쪽(왼쪽 발, 오른쪽 발) 검사
+            bool rightFootHit = Physics.CheckCapsule(transform.position - right + up, transform.position - right - up, 0.1f,
+                groundLayer);
+            bool leftFootHit = Physics.CheckCapsule(transform.position + right + up, transform.position + right - up, 0.1f,
+                groundLayer);
 
             // 발이 지면에 닿았는지 여부에 따라 hitCount 증가
             hitCount += rightFootHit ? 1 : 0;
@@ -560,8 +534,9 @@ namespace _01_Scripts.Third_Person_Controller
             characterController.height = Mathf.Approximately(crouchVal, 1)
                 ? controllerDefaultHeight * .7f // 구부린 상태: 컨트롤러 높이를 줄임
                 : controllerDefaultHeight; // 서있는 상태: 기본 높이로 설정
+            
         }
-
+        
         void HandleBalanceOnNarrowBeamWithTag()
         {
             // 플레이어 주변(.2f 반지름 구형 영역)에서 특정 태그("NarrowBeam" 또는 "SwingableLedge")를 가진 오브젝트 탐지
@@ -649,11 +624,11 @@ namespace _01_Scripts.Third_Person_Controller
 
         bool isTurning = false;
 
-        void GetInput()
+        public void GetInputFromInputManager(Vector2 input)
         {
             // 입력 값(DirectionInput)을 가져와 x축(좌/우)과 y축(앞/뒤) 값을 각각 저장
-            float h = inputManager.DirectionInput.x; // 수평 입력
-            float v = inputManager.DirectionInput.y; // 수직 입력
+            float h = input.x; // 수평 입력
+            float v = input.y; // 수직 입력
 
             // 입력된 방향의 벡터를 생성 및 저장 (y 값은 0으로 고정)
             moveInput = new Vector3(h, 0, v);
@@ -666,15 +641,30 @@ namespace _01_Scripts.Third_Person_Controller
             desiredMoveDir = playerController.CameraPlanarRotation * moveInput;
 
             // 입력된 방향의 벡터 길이를 1로 제한하여 정규화된 값을 유지 (Vector3.ClampMagnitude)
+            // Normalize를 하지 않는 이유는 콘솔입력을 위함
             desiredMoveDir = Vector3.ClampMagnitude(desiredMoveDir, 1);
 
             // 캐릭터가 이동할 방향 벡터를 최종적으로 moveDir에 저장
             moveDir = desiredMoveDir;
+
+
+            // 모바일 플랫폼(Android 또는 iOS)에서만 실행
+#if UNITY_ANDROID || UNITY_IOS
+    // 기본 상태를 달리기 상태로 설정한 경우
+    if (setDefaultStateToRunning)
+    {
+        // moveAmount가 1(최대 이동량)일 경우 스프린트 모드 타이머 증가
+        if (moveAmount == 1)
+            sprintModeTimer += Time.deltaTime; // 경과 시간을 누적
+        else
+            sprintModeTimer = 0; // 이동량이 1이 아닐 경우 타이머 초기화
+    }
+#endif
         }
 
         Quaternion velocityRotation;
 
-        bool Turnback()
+        bool TurnBack()
         {
             // 움직임 입력이나 목표 방향이 없으면 되돌아보지 않음
             if (moveInput == Vector3.zero || desiredMoveDir == Vector3.zero)
@@ -730,16 +720,32 @@ namespace _01_Scripts.Third_Person_Controller
 
         void GroundCheck()
         {
-            isGrounded = Physics.CheckSphere(transform.TransformPoint(groundCheckOffset), groundCheckRadius,
-                groundLayer);
+            var spherePosition = new Vector3(transform.position.x, transform.position.y - groundCheckOffset,
+                transform.position.z);
+            isGrounded = Physics.CheckSphere(spherePosition, groundCheckRadius, groundLayer,
+                QueryTriggerInteraction.Ignore);
+
+            // isGrounded = Physics.CheckSphere(transform.TransformPoint(groundCheckOffset), groundCheckRadius,
+            //     groundLayer);
             animator.SetBool(AnimatorParameters.IsGrounded, isGrounded);
         }
 
+
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = new Color(0, 1, 0, 0.5f);
-            Gizmos.DrawSphere(transform.TransformPoint(groundCheckOffset), groundCheckRadius);
+            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f); // 지면일 때 초록색
+            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f); // 공중일 때 빨간색
+
+            Gizmos.color = isGrounded ? transparentGreen : transparentRed;
+
+            // 지면 체크를 위한 구체(Gizmo) 표시
+            Gizmos.DrawSphere(
+                new Vector3(transform.position.x, transform.position.y - groundCheckOffset,
+                    transform.position.z), groundCheckRadius);
+
+            // Gizmos.DrawSphere(transform.TransformPoint(groundCheckOffset), groundCheckRadius);
         }
+
 
         public void HandleTurningAnimation(bool enable)
         {
@@ -748,7 +754,7 @@ namespace _01_Scripts.Third_Person_Controller
                 animator.SetFloat(AnimatorParameters.Rotation, 0);
         }
 
-        public IEnumerator DoLocomotionAction(string anim, bool _useRootmotionMovement = false,
+        public IEnumerator DoLocomotionAction(string anim, bool _useRootMotionMovement = false,
             Action onComplete = null, float crossFadeTime = .2f, Quaternion? _targetRotation = null,
             bool setMoveAmount = false)
         {
@@ -756,7 +762,7 @@ namespace _01_Scripts.Third_Person_Controller
             preventLocomotion = true;
 
             // Root Motion 사용 여부 설정 (Root Motion: 애니메이션에서 직접 이동 데이터를 가져오는 것)
-            this.useRootmotionMovement = _useRootmotionMovement;
+            this.useRootmotionMovement = _useRootMotionMovement;
             EnableRootMotion(); // Root Motion 활성화
 
             // 애니메이션 시작 (CrossFade를 통해 지정된 기간(crossFadeTime) 동안 부드럽게 새 애니메이션으로 전환)
@@ -771,7 +777,7 @@ namespace _01_Scripts.Third_Person_Controller
             while (timer <= animState.length) // 현재 애니메이션 상태의 길이 동안 루프 실행
             {
                 // Turnback 플래그가 비활성화되어 있고 새 Turnback 조건이 만족되면 Locomotion 종료
-                if (!turnBack && Turnback()) yield break;
+                if (!turnBack && TurnBack()) yield break;
 
                 // MoveAmount 값을 애니메이터에 업데이트 (속도를 유지하거나 런닝 상태로 전환)
                 if (setMoveAmount)
@@ -846,7 +852,7 @@ namespace _01_Scripts.Third_Person_Controller
             }
         }
 
-        void VerticalJump()
+        public void VerticalJump()
         {
             // 점프를 수행할 조건 검사: verticalJump가 활성화되어 있어야 하며, 땅에 닿아 있어야(IsGrounded) 함
             if (!verticalJump || !IsGrounded) return;
@@ -856,7 +862,7 @@ namespace _01_Scripts.Third_Person_Controller
                 animator.GetBoneTransform(HumanBodyBones.Head).position, // 머리의 위치
                 .15f, // SphereCast의 반지름
                 Vector3.up, // 위쪽 방향 조건
-                out RaycastHit headHitData, // 충돌 정보 저장
+                out _,
                 headHeightThreshold, // 최대 높이
                 environmentScanner.ObstacleLayer // 검사할 충돌 레이어
             );
@@ -1030,6 +1036,7 @@ namespace _01_Scripts.Third_Person_Controller
                 animator.CrossFadeInFixedTime("LandAndStepForward", .1f);
             }
         }
+
         public bool IsOnLedge { get; set; }
 
         public (Vector3, Vector3) LedgeMovement(Vector3 currMoveDir, Vector3 currVelocity)

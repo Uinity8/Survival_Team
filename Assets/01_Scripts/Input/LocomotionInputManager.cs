@@ -1,199 +1,96 @@
 using System;
+using System.Collections;
+using _01_Scripts.Third_Person_Controller;
 using UnityEngine;
 
 namespace _01_Scripts.Input
 {
     public class LocomotionInputManager : MonoBehaviour
     {
-        [Header("Keys")]
-        [SerializeField] KeyCode jumpKey = KeyCode.Space;
-        [SerializeField] KeyCode dropKey = KeyCode.E;
-        [SerializeField] KeyCode moveType = KeyCode.Tab;
-        [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
-        [SerializeField] KeyCode interactionKey = KeyCode.E;
-
-
-        [Header("Buttons")]
-        [SerializeField] string jumpButton;
-        [SerializeField] string dropButton;
-        [SerializeField] string moveTypeButton;
-        [SerializeField] string sprintButton;
-        [SerializeField] string interactionButton;
-
-        public bool JumpKeyDown { get; set; }
         public bool Drop { get; set; }
         public Vector2 DirectionInput { get; set; }
         public Vector2 CameraInput { get; set; }
         public bool ToggleRun { get; set; }
         public bool SprintKey { get; set; }
-        public bool Interaction { get; set; }
 
-        public event Action OnInteractionPressed;
+        public event Action<float> OnInteractionHolding;
         public event Action<float> OnInteractionReleased;
 
-        public float InteractionButtonHoldTime { get; set; } = 0f;
+        public float InteractionButtonHoldTime { get; set; } = 0f; //UI에서 쓸 수도 있어서 퍼블릭
         bool interactionButtonDown;
 
-#if inputsystem
-        LocomotionInputAction input;
+        private LocomotionController _locomotionController;
+        
+        PlayerInputAction input;
+
+        private void Awake()
+        {
+            input = new PlayerInputAction();
+            InitializeInputSystem();
+        }
+
         private void OnEnable()
         {
-            input = new LocomotionInputAction();
-            input.Enable();
+            input.LocoMotion.Enable();
         }
+
         private void OnDisable()
         {
-            input.Disable();
-        }
-#endif
-
-
-        private void Update()
-        {
-            //Horizontal and Vertical Movement
-            HandleDirectionalInput();
-
-            //Camera Movement
-            HandlecameraInput();
-
-            //JumpKeyDown
-            HandleJumpKeyDown();
-
-            //Drop
-            HandleDrop();
-
-            //Walk or Run 
-            HandleToggleRun();
-
-            //Sprint
-            HandleSprint();
-
-            //Interaction
-            HandleInteraction();
+            input.LocoMotion.Disable();
         }
 
-        void HandleDirectionalInput()
+        
+        private void Start()
         {
-#if inputsystem
-            DirectionInput = input.Locomotion.MoveInput.ReadValue<Vector2>();
-#else
-            float h = UnityEngine.Input.GetAxisRaw("Horizontal");
-            float v = UnityEngine.Input.GetAxisRaw("Vertical");
-            DirectionInput = new Vector2(h, v);
-#endif
+            _locomotionController = GetComponent<LocomotionController>();   
+        }
+        
+
+        private void InitializeInputSystem()
+        {
+            input.LocoMotion.Move.performed += ctx => OnMoveInput(ctx.ReadValue<Vector2>());
+            input.LocoMotion.Move.canceled += ctx => OnMoveInput(ctx.ReadValue<Vector2>());
+            input.LocoMotion.Sprint.started += _ => SprintKey = true;
+            input.LocoMotion.Sprint.canceled += _ => SprintKey = false;
+            input.LocoMotion.Jump.started += _ => OnJumpInput();
+            input.LocoMotion.Interaction.started += _ => OnInteractionStart();
+            input.LocoMotion.Interaction.canceled += _ => OnInteractionCanceled();
         }
 
-        void HandlecameraInput()
+        private void OnMoveInput(Vector2 value)
         {
-#if inputsystem
-            CameraInput = input.Locomotion.CameraInput.ReadValue<Vector2>();
-#else
-            float x = UnityEngine.Input.GetAxis("Mouse X");
-            float y = UnityEngine.Input.GetAxis("Mouse Y");
-            CameraInput = new Vector2(x, y);
-#endif
+            DirectionInput = value; //혹시 몰라서 
+            _locomotionController.GetInputFromInputManager(value);
         }
 
-        void HandleJumpKeyDown()
+        private void OnJumpInput()
         {
-#if inputsystem
-            JumpKeyDown = input.Locomotion.Jump.WasPressedThisFrame();
-#else
-            JumpKeyDown = UnityEngine.Input.GetKeyDown(jumpKey) || (String.IsNullOrEmpty(jumpButton) ? false : UnityEngine.Input.GetButtonDown(jumpButton));
-#endif
+            _locomotionController.VerticalJump();
+        }
+        
+        
+        private void OnInteractionStart()
+        {
+            InteractionButtonHoldTime = 0f; // 키를 누른 순간 시간 초기화
+            interactionButtonDown = true;
+            StartCoroutine(CheckHoldTime());
         }
 
-        void HandleDrop()
+        private void OnInteractionCanceled()
         {
-#if inputsystem
-            Drop = input.Locomotion.Drop.inProgress;
-#else
-            Drop = UnityEngine.Input.GetKey(dropKey) || (String.IsNullOrEmpty(dropButton) ? false : UnityEngine.Input.GetButton(dropButton));
-#endif
+            interactionButtonDown = false; // 키를 뗐으므로 체크 중단
+            OnInteractionReleased?.Invoke(InteractionButtonHoldTime);
         }
 
-        void HandleToggleRun()
+        private IEnumerator CheckHoldTime()
         {
-#if inputsystem
-            ToggleRun = input.Locomotion.MoveType.WasPressedThisFrame();
-#else
-            ToggleRun = UnityEngine.Input.GetKeyDown(moveType) || IsButtonDown(moveTypeButton);
-#endif
-        }
-
-        void HandleSprint()
-        {
-#if inputsystem
-            SprintKey = input.Locomotion.SprintKey.inProgress;
-#else
-            SprintKey = UnityEngine.Input.GetKey(sprintKey) || (String.IsNullOrEmpty(sprintButton) ? false : UnityEngine.Input.GetButton(sprintButton));
-#endif
-        }
-
-        void HandleInteraction()
-        {
-#if inputsystem
-            if (input.Locomotion.Interaction.WasPressedThisFrame())
+            while (interactionButtonDown)
             {
-                interactionButtonDown = true;
-                Interaction = true;
-            }
-            else
-            {
-                Interaction = false;
-            }
-
-            if (interactionButtonDown)
-            {
-                if (input.Locomotion.Interaction.WasReleasedThisFrame())
-                {
-                    interactionButtonDown = false;
-                    InteractionButtonHoldTime = 0f;
-                }
-
                 InteractionButtonHoldTime += Time.deltaTime;
+                OnInteractionHolding?.Invoke(InteractionButtonHoldTime);
+                yield return new WaitForSeconds(0.3f);
             }
-
-#else
-
-            if (UnityEngine.Input.GetKeyDown(interactionKey) || IsButtonDown(interactionButton))
-            {
-                interactionButtonDown = true;
-                Interaction = true;
-            }
-            else
-            {
-                Interaction = false;
-            }
-
-            if (interactionButtonDown)
-            {
-                if (UnityEngine.Input.GetKeyUp(interactionKey) || IsButtonUp(interactionButton))
-                {
-                    interactionButtonDown = false;
-                    InteractionButtonHoldTime = 0f;
-                }
-
-                InteractionButtonHoldTime += Time.deltaTime;
-            }
-#endif
         }
-
-
-        public bool IsButtonDown(string buttonName)
-        {
-            if (!String.IsNullOrEmpty(buttonName))
-                return UnityEngine.Input.GetButtonDown(buttonName);
-            else
-                return false;
-        }
-
-        public bool IsButtonUp(string buttonName)
-        {
-            if (!String.IsNullOrEmpty(buttonName))
-                return UnityEngine.Input.GetButtonUp(buttonName);
-            else
-                return false;
-        }
+        
     }
 }
