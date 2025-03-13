@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c9ec1b3dc77d384787e8cef25038e7c, type: 3}
+  m_Name: Linear
+  m_EditorClassIdentifier: 
+  spawnWeapon: 0
+  weaponHolder: 18
+  localPosition: {x: 0, y: 0, z: 0}
+  localRotation: {x: 0, y: 0, z: 0}
+  weaponModel: {fileID: 0}
+  attacks:
+  - attackType: 0
+    minDistance: 0
+    maxDistance: 4
+    healthThreshold: 100
+    attacks:
+    - attack: {fileID: 11400000, guid: a320e15a0b27476429f1a0abc22ffc93, type: 2}
+      canBeCharged: 0
+      chargedAttack: {fileID: 0}
+    attack:
+      attack: {fileID: 11400000, guid: a320e15a0b27476429f1a0abc22ffc93, type: 2}
+      canBeCharged: 0
+      chargedAttack: {fileID: 0}
+    animationDistance: 1.0368572
+    serialized: 1
+  - attackType: 0
+    minDistance: 0
+    maxDistance: 4
+    healthThreshold: 100
+    attacks:
+    - attack: {fileID: 11400000, guid: 7bd7e4cbc33e2f0488ecb08bbaa4bfbe, type: 2}
+      canBeCharged: 0
+      chargedAttack: {fileID: 0}
+    attack:
+      attack: {fileID: 11400000, guid: 7bd7e4cbc33e2f0488ecb08bbaa4bfbe, type: 2}
+      canBeCharged: 0
+      chargedAttack: {fileID: 0}
+    animationDistance: 1.5678263
+    serialized: 1
+  heavyAttacks: []
+  reactionData: {fileID: 11400000, guid: 6036ddc2962f52e47ba682d6078af963, type: 2}
+  weaponEquipAnimation: {fileID: 0}
+  weaponActivationTime: 0
+  weaponUnEquipAnimation: {fileID: 0}
+  weaponDeactivationTime: 0
+  canBlock: 1
+  blocking: {fileID: -6801083763907307519, guid: a75a59a0357622e409954377d17ba6e3, type: 3}
+  blockedDamage: 25
+  blockReactionData: {fileID: 11400000, guid: c05e53600afde0e468c7f46d59ffed37, type: 2}
+  blockMask: {fileID: 0}
+  overrideController: {fileID: 0}
+  useRootmotion: 1
+  overrideMoveSpeed: 0
+  walkSpeed: 0
+  runSpeed: 0
+  sprintSpeed: 0
+  combatMoveSpeed: 0
+  weaponHoldingClip: {fileID: 0}
+  weaponHolderMask: {fileID: 0}
+  weaponEquipSound: {fileID: 0}
+  weaponUnEquipSound: {fileID: 0}
+  minAttackDistance: 0
