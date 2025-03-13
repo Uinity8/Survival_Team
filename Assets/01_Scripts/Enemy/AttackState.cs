@@ -6,7 +6,7 @@ public class AttackState : IEnemyState
 {
     public void Enter(EnemyBase enemy)
     {
-
+        enemy.animator.SetTrigger("Attack");
     }
 
     public void Execute(EnemyBase enemy)

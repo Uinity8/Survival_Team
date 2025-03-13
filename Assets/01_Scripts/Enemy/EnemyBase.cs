@@ -30,9 +30,22 @@ public class EnemyBase : MonoBehaviour
     public float minProwlWaitTime;
     public float maxProwlWaitTime;
 
-    private NavMeshAgent agent;
+    public NavMeshAgent agent;
     public float detectDistance;
+    public float playerDistance;
 
+    public Animator animator;
+
+    private void Awake()
+    {
+        agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+    }
+    void Update()
+    {
+        playerDistance = Vector3.Distance(transform.position, transform.position/*플레이어 포지션*/);
+        currentState.Execute(this);
+    }
 
     public EnemyBase()
     {
@@ -92,19 +105,12 @@ public class EnemyBase : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        currentState.Execute(this);
-    }
-
     //Idle 행동
 
     //Prowl 행동
-    public void Prowl()
+    public void SetProwl()
     {
-        if (!(currentState is ProwlState))
-            ChangeState(EnemyStates.Idle);
-
+        agent.SetDestination(ProwlLocation());
     }
     Vector3 ProwlLocation()
     {
