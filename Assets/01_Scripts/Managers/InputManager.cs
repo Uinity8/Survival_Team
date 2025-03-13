@@ -27,7 +27,7 @@ namespace Managers
             _playerInput = new PlayerInputActions();
         }
 
-        protected void Start()
+        private void Start()
         {
             InitializeInputs();
         }
@@ -49,6 +49,9 @@ namespace Managers
             _playerInput.Player.Zoom.performed += ctx => OnZoomInput?.Invoke(ctx.ReadValue<float>());
 
             _playerInput.Shorcut.Inventory.started += _ =>OnInventoryPressed?.Invoke();
+            
+            _playerInput.Player.Enable();
+            _playerInput.Shorcut.Enable();
         }
 
         private void OnEnable()
