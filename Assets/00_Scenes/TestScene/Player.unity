@@ -1945,9 +1945,9 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8418808593668384457}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
-  m_Controller: {fileID: 9100000, guid: 40db3173a05ae3242b1c182a09b0a183, type: 2}
-  m_CullingMode: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -3467,13 +3467,12 @@ GameObject:
   - component: {fileID: 9195872577592786035}
   - component: {fileID: 2989934644286301705}
   - component: {fileID: 8418808593668384451}
+  - component: {fileID: 9195872577592786042}
   - component: {fileID: 9195872577592786041}
   - component: {fileID: 9195872577592786040}
-  - component: {fileID: 9195872577592786039}
-  - component: {fileID: 9195872577592786042}
-  - component: {fileID: 9195872577592786037}
   - component: {fileID: 9195872577592786038}
-  - component: {fileID: 9195872577592786036}
+  - component: {fileID: 9195872577592786037}
+  - component: {fileID: 9195872577592786043}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -3770,23 +3769,6 @@ Transform:
   - {fileID: 5354870988395856618}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9195872577592786036
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8418808593668384457}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 909d917d73a63f940ac158d02e936645, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  canPush: 0
-  strength: 1.1
 --- !u!114 &9195872577592786037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3796,9 +3778,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 8418808593668384457}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce674bb92b714cf3b77254de3b363a7b, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c88c00da5944684bdb33c670502eab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heightRayLength: 4
+  obstacleCheckRange: 0.7
+  ledgeHeightThreshold: 1
+  <ObstacleLayer>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 1
+  <LedgeLayer>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!114 &9195872577592786038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3808,43 +3799,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 8418808593668384457}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1321e8b6db042728fc455ff4fad75ec, type: 3}
+  m_Script: {fileID: 11500000, guid: d5986c4576a54fceb2a9eb850b34eb8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
-  FootstepAudioClips:
-  - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
-  - {fileID: 8300000, guid: 85016e0f2b01da248b9663dd49a161b0, type: 3}
-  - {fileID: 8300000, guid: 186de84b3207156479abe98f4958fed0, type: 3}
-  - {fileID: 8300000, guid: 1a91fcd19acf1e54bba0945d9f390849, type: 3}
-  - {fileID: 8300000, guid: 14e8a8d2158bec840b56c54f5266e692, type: 3}
-  - {fileID: 8300000, guid: 29841e7d5bbfb5b419c9ad16ca8bc4c1, type: 3}
-  - {fileID: 8300000, guid: dd1af302b8902684d9381de1f2d3a5af, type: 3}
-  - {fileID: 8300000, guid: 67c8b33e424ccdc4486edf538ab91c5a, type: 3}
-  - {fileID: 8300000, guid: 274649b0e221539409070ebf6c18918b, type: 3}
-  - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
-  FootstepAudioVolume: 0.5
---- !u!114 &9195872577592786039
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8418808593668384457}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6beffdea096f4464a1bcef2a74241e87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MoveSpeed: 2
-  SprintSpeed: 5.335
-  SprintStaminaCost: 20
-  RotationSmoothTime: 0.12
-  SpeedChangeRate: 10
-  JumpHeight: 1.2
-  Gravity: -15
-  JumpTimeout: 0.5
-  FallTimeout: 0.15
+  jumpKey: 32
+  dropKey: 101
+  moveType: 9
+  sprintKey: 304
+  interactionKey: 101
+  jumpButton: 
+  dropButton: 
+  moveTypeButton: 
+  sprintButton: 
+  interactionButton: 
 --- !u!114 &9195872577592786040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3854,15 +3821,48 @@ MonoBehaviour:
   m_GameObject: {fileID: 8418808593668384457}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18428975be3540ff83218bcd4010c6f4, type: 3}
+  m_Script: {fileID: 11500000, guid: a21b9d3931c045ec95a6ec6a0cfbd474, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isGrounded: 0
-  GroundedOffset: -0.14
-  GroundedRadius: 0.28
-  GroundLayers:
+  sprintSpeed: 6.5
+  runSpeed: 4.5
+  walkSpeed: 2
+  rotationSpeed: 2.5
+  acceleration: 8
+  deceleration: 6
+  enableSprint: 1
+  setDefaultStateToRunning: 1
+  useMultiDirectionalAnimation: 0
+  playerDirectionBlend: 1
+  faceCameraForwardWhenIdle: 0
+  speedMultiplier: 0.8
+  sprintDirectionThreshold: 0.9
+  forwardHipRotationBlend: 0.5
+  rotateHipForBackwardAnimation: 1
+  backwardHipRotationBlend: 0.8
+  verticalJump: 0
+  timeToJump: 0.4
+  jumpMoveSpeed: 4
+  jumpMoveAcceleration: 4
+  preventFallingFromLedge: 1
+  slidingMovementThresholdFromLedge: -1
+  preventLedgeRotation: 0
+  preventWallSlide: 0
+  enableBalanceWalk: 1
+  balanceWalkDetectionType: 0
+  enableTurningAnim: 1
+  playQuickTurnAnimation: 1
+  QuickTurnThreshhold: -0.01
+  playQuickStopAnimation: 0
+  runToStopThreshhold: 0.4
+  groundCheckRadius: 0.2
+  groundCheckOffset: {x: 0, y: 0.15, z: 0.07}
+  groundLayer:
     serializedVersion: 2
     m_Bits: 1
+  LedgeLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &9195872577592786041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3872,10 +3872,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 8418808593668384457}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a087e7e2aa84df1b7d0cf272490cdd9, type: 3}
+  m_Script: {fileID: 11500000, guid: 2340bbaba30f466197f7445179af03cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &9195872577592786042
+  managedScripts:
+  - {fileID: 9195872577592786040}
+  <CurrentSystemState>k__BackingField: 0
+--- !u!136 &9195872577592786042
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8418808593668384457}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.3
+  m_Height: 1.7
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.87, z: 0.08}
+--- !u!114 &9195872577592786043
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3884,16 +3910,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 8418808593668384457}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7013a99445c14926aad71baf46537b71, type: 3}
+  m_Script: {fileID: 11500000, guid: d873b68cf4ad4585a942931b869a3472, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  move: {x: 0, y: 0}
-  look: {x: 0, y: 0}
-  jump: 0
-  sprint: 0
-  analogMovement: 0
-  cursorLocked: 1
-  cursorInputForLook: 1
+  footStepSounds:
+  - {fileID: 8300000, guid: dbdca68d3e91dce438e50a580944f109, type: 3}
+  - {fileID: 8300000, guid: 1db0ddb4016fedd4ebf3429952e476e0, type: 3}
+  - {fileID: 8300000, guid: 2ea9ebae353cfc94d8a4680fdda0c76c, type: 3}
+  - {fileID: 8300000, guid: 478fa7e4d9f0afa4692b3709afe45da2, type: 3}
+  footStepParticles: []
+  overrideStepEffects: []
+  overrideType: 0
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  soundIgnoreStates: 
+  particleIgnoreStates: 
+  adjustVolumeBasedOnSpeed: 1
+  minVolume: 0.2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

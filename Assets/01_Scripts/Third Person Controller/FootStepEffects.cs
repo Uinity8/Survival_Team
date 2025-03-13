@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using _01_Scripts.System;
+using Framework.Audio;
 using UnityEngine;
 
 namespace _01_Scripts.Third_Person_Controller
@@ -98,10 +99,19 @@ namespace _01_Scripts.Third_Person_Controller
                 // playerController가 있고, 현재 시스템 상태가 소리 무시 목록에 없다면 소리 재생
                 if (playerController != null && !soundIgnoreStates.Contains(playerController.FocusedSystemState))
                 {
+                    //여기에 낙하중 애니메이션이면 Land 사운드나게 추가해야함!!!!
+                    
+                  
                     float moveAmount = 1;
-                    // Locomotion 상태에서 "Locomotion" 애니메이션이면 moveAmount 값을 애니메이터 파라미터에서 가져와 조정
-                    if(playerController.CurrentSystemState == SystemState.Locomotion && animator.GetCurrentAnimatorStateInfo(0).IsName("Locomotion"))
-                        moveAmount = animator.GetFloat(AnimatorParameters.MoveAmount) / 1.5f;
+                    // 속도에 따른 볼륨 조절 옵션이 활성화되어 있으면 볼륨을 조정
+                    if (adjustVolumeBasedOnSpeed) 
+                    {
+                        // Locomotion 상태에서 "Locomotion" 애니메이션이면 moveAmount 값을 애니메이터 파라미터에서 가져와 조정
+                        if (playerController.CurrentSystemState == SystemState.Locomotion &&
+                            animator.GetCurrentAnimatorStateInfo(0).IsName("Locomotion"))
+                            moveAmount = animator.GetFloat(AnimatorParameters.MoveAmount) / 1.5f;
+                    }
+
                     PlaySfx(sounds[Random.Range(0, sounds.Count)], moveAmount);
                 }
                 else if (playerController == null)
@@ -122,25 +132,10 @@ namespace _01_Scripts.Third_Person_Controller
         // volume: 재생 볼륨 (기본값 1)
         void PlaySfx(AudioClip clip, float volume = 1)
         {
-            // 새 GameObject 생성 후 해당 위치에 배치
-            GameObject sfx = new GameObject
-            {
-                transform =
-                {
-                    position = transform.position
-                }
-            };
-            // AudioSource 컴포넌트를 추가하고 클립을 설정
-            var audioSource = sfx.AddComponent<AudioSource>();
-            audioSource.clip = clip;
-
-            // 속도에 따른 볼륨 조절 옵션이 활성화되어 있으면 볼륨을 조정
-            if (adjustVolumeBasedOnSpeed)
-                audioSource.volume = Mathf.Clamp(volume, minVolume, audioSource.volume);
-
-            // 오디오 재생 후 일정 시간 후에 GameObject 파괴
-            audioSource.Play();
-            Destroy(sfx, 1.5f);
+            
+            volume = Mathf.Max(volume, minVolume);
+            
+            SoundManager.PlaySFX(clip, transform.position, volume);
         }
 
         // SpawnParticle: 주어진 파티클 이펙트를 footTransform 위치와 회전값으로 인스턴스화합니다.
