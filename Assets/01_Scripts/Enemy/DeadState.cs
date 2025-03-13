@@ -8,7 +8,7 @@ public class DeadState : IEnemyState
     public void Enter(EnemyBase enemy)
     {
         enemy.animator.SetTrigger("Die");
-        enemy.StartCoroutine(DieTime(enemy));
+        enemy.Die();
     }
 
     public void Execute(EnemyBase enemy)
@@ -19,15 +19,5 @@ public class DeadState : IEnemyState
     public void Exit(EnemyBase enemy)
     {
 
-    }
-
-    IEnumerator DieTime(EnemyBase enemy)
-    {
-        if(enemy.health <= 0)
-        {
-            yield  return new WaitForSeconds(enemy.dieDestroyTime);
-
-            enemy.Die();
-        }
     }
 }

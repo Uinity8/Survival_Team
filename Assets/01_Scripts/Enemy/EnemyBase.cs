@@ -13,7 +13,7 @@ public enum EnemyStates
     Attack,
     Dead
 }
-public abstract class EnemyBase : MonoBehaviour
+public abstract class EnemyBase : MonoBehaviour, IDamagable
 {
     private IEnemyState currentState;
     private Dictionary<EnemyStates, IEnemyState> states = new Dictionary<EnemyStates, IEnemyState>();
@@ -23,16 +23,18 @@ public abstract class EnemyBase : MonoBehaviour
     public float moveSpeed;
     public float runSpeed;
     public float dieDestroyTime;
+    //public ItemData[] dropItem;
 
     [Header("Attack")]
     public float damage;
     public float attackSpeed;
     public float attackRange;
     public float lastAttackTime;
+    public float attackAngle;
     public List<int> attackPattern;  //AttackPattern Listup (AttackPattern0(basicattack) - 0, attackpattern1 - 1 .....) 
     public string[] attackAnimName;
-    public Action[] attackAction;
 
+    public Action[] attackAction;
 
     [Header("Idle State")]
     public float minProwlDistance;
@@ -43,6 +45,7 @@ public abstract class EnemyBase : MonoBehaviour
     public NavMeshAgent agent;
     public float detectDistance;
     public float playerDistance;
+    private Rigidbody _rigidbody;
 
     public Transform player;
 
@@ -52,23 +55,19 @@ public abstract class EnemyBase : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void Start()
     {
         AutoRegisterAttack();
+        ChangeState(EnemyStates.Idle);
     }
 
     void Update()
     {
-        playerDistance = Vector3.Distance(transform.position, player.position);
+        playerDistance = Vector3.Distance(transform.position, player.transform.position);
         currentState.Execute(this);
-    }
-
-    public EnemyBase()
-    {
-        currentState = new IdleState();
-        ChangeState(EnemyStates.Idle);
     }
 
     public void ChangeState(EnemyStates newStateKey)
@@ -86,6 +85,8 @@ public abstract class EnemyBase : MonoBehaviour
         currentState = states[newStateKey];
 
         ChangeStat(newStateKey);
+
+        Debug.Log(currentState.ToString());
 
         if (currentState != null)
         {
@@ -117,6 +118,7 @@ public abstract class EnemyBase : MonoBehaviour
         switch (newStateKey)
         {
             case EnemyStates.Idle:
+                agent.speed = moveSpeed;
                 agent.isStopped = true;
                 break;
             case EnemyStates.Prowl:
@@ -128,12 +130,16 @@ public abstract class EnemyBase : MonoBehaviour
                 agent.isStopped = false;
                 break;
             case EnemyStates.Attack:
+                agent.speed = moveSpeed;
                 agent.isStopped = true;
                 break;
             case EnemyStates.Dead:
+                agent.speed = moveSpeed;
                 agent.isStopped = true;
                 break;
         }
+
+        animator.speed = agent.speed / moveSpeed;
     }
 
     //Idle 행동
@@ -174,7 +180,7 @@ public abstract class EnemyBase : MonoBehaviour
     public bool CheckChase()
     {
         NavMeshPath path = new NavMeshPath();
-        if (agent.CalculatePath(player.position, path))
+        if (agent.CalculatePath(player.transform.position, path))
         {
             return true;
         }
@@ -183,30 +189,46 @@ public abstract class EnemyBase : MonoBehaviour
 
     public void SetChase()
     {
-        agent.SetDestination(player.position);
+        agent.SetDestination(player.transform.position);
     }
 
     //Attack 행동
     //AttackPattern Listup (AttackPattern0(basicattack) - 0, attackpattern1 - 1 .....)
     protected virtual void AttackPattern0()
     {
-
+        //PlayerManager.Instance.player.GetComponent<IDamagable>().TakeDamage(damage);
     }
 
     protected virtual void AttackPattern1()
     {
+        //PlayerManager.Instance.player.GetComponent<IDamagable>().TakeDamage(damage);
+    }
 
+    public bool AttackOnSight()
+    {
+        Vector3 playerDirection = player.transform.position - transform.position;
+        float angle = Vector3.Angle(transform.position, playerDirection);
+        return angle < attackAngle * 0.5f;
     }
 
     //Dead 행동
-    public void Die()
+    public void Die() //아이템 프리팹 없어서 주석 처리
     {
+        //for(int i = 0; i < dropItem.Length, i++)
+        //{
+        //    GameObject drops = Instantiate(dropItem[i].dropPrefab, transform.position);
+        //    Rigidbody rbDrops = drops.GetComponent<Rigidbody>();
+
+        //    rbDrops.AddForce(transform.up * 1f);
+        //}
+        
         Destroy(this.gameObject);
     }
 
     //스킬 array 자동 등록
     private void AutoRegisterAttack()
     {
+        //GetMethods(BindingFlags.Instance | BindingFlags.NonPublic) - 클래스내 protected, private 메서드 검색
         MethodInfo[] methods = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
             .Where(m => m.Name.StartsWith("AttackPattern")).OrderBy(m => m.Name).ToArray();
 
@@ -216,5 +238,18 @@ public abstract class EnemyBase : MonoBehaviour
         {
             attackAction[i] = (Action)Delegate.CreateDelegate(typeof(Action), this, methods[i]);
         }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        {
+            if (health <= 0)
+            {
+                ChangeState(EnemyStates.Dead);
+            }
+        }
+        Vector3 dir = player.transform.position - transform.position + new Vector3(0, 0.3f, 0);
+        _rigidbody.AddForce(dir.normalized * 2f);
     }
 }

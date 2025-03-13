@@ -12,7 +12,7 @@ public class ChaseState : IEnemyState
 
     public void Execute(EnemyBase enemy)
     {
-        if(enemy.playerDistance <= enemy.attackRange)
+        if (enemy.playerDistance <= enemy.attackRange)
         {
             enemy.ChangeState(EnemyStates.Attack);
         }

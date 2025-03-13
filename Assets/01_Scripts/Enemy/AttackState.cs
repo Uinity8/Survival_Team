@@ -18,22 +18,22 @@ public class AttackState : IEnemyState
 
     public void Execute(EnemyBase enemy)
     {
-        if (Time.time - enemy.lastAttackTime > enemy.attackSpeed)
+        if (Time.time - enemy.lastAttackTime > enemy.attackSpeed && enemy.AttackOnSight())
         {
             enemy.lastAttackTime = Time.time;
 
             enemy.attackAction[attackType]?.Invoke();
+
+            enemy.ChangeState(EnemyStates.Attack);
+
         }
 
         if(enemy.playerDistance > enemy.attackRange)
         {
-            if (enemy.CheckChase())
-            {
-                enemy.ChangeState(EnemyStates.Chase);
-            }
+            enemy.ChangeState(EnemyStates.Chase);
         }
 
-        if(enemy.playerDistance > enemy.detectDistance)
+        if (enemy.playerDistance > enemy.detectDistance)
         {
             enemy.ChangeState(EnemyStates.Idle);
         }
@@ -41,7 +41,8 @@ public class AttackState : IEnemyState
 
     public void Exit(EnemyBase enemy)
     {
-
+        attackType = -1;
+        anim = "";
     }
 
     int GetRandomAttackPattern(EnemyBase enemy)
