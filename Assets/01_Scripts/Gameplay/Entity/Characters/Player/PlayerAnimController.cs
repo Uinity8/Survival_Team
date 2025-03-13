@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Framework.Characters
 {
     [RequireComponent(typeof(Animator))]
-    public class AnimationController : MonoBehaviour
+    public class PlayerAnimController : MonoBehaviour
     {
         // animation IDs
         private int _animIDSpeed;
@@ -14,9 +14,9 @@ namespace Framework.Characters
         
         private Animator _animator;
 
-        public void Initialize(Animator animator)
+        public void Start()
         {
-            _animator = animator;
+            _animator = GetComponent<Animator>();
             AssignAnimationIDs();
         }
         
