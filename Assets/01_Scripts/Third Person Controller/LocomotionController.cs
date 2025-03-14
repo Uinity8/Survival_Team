@@ -180,7 +180,7 @@ namespace _01_Scripts.Third_Person_Controller
         // 캐릭터와 로코모션 관련 오브젝트 및 컴포넌트 참조
         FootIK footIk; // 발 IK 관리 컴포넌트
         PlayerController playerController; // 플레이어 컨트롤러
-        GameObject cameraGameObject; // 카메라 오브젝트 참조
+        GameObject cameraGameObject; // 카메라 오브젝트
         CharacterController characterController; // 캐릭터 컨트롤러 컴포넌트
         Animator animator; // 애니메이션을 제어하는 애니메이터
         EnvironmentScanner environmentScanner; // 주변 환경을 분석하는 스캐너
@@ -188,6 +188,10 @@ namespace _01_Scripts.Third_Person_Controller
 
         private void Awake()
         {
+            Debug.Log((Camera.main != null ? "Camera found" : "Camera not found"));
+            if(Camera.main != null)
+                cameraGameObject = Camera.main.gameObject;
+                
             _walkSpeed = walkSpeed;
             _runSpeed = runSpeed;
             _sprintSpeed = sprintSpeed;
@@ -196,7 +200,6 @@ namespace _01_Scripts.Third_Person_Controller
         void Start()
         {
             playerController = GetComponent<PlayerController>();
-            cameraGameObject = playerController.CameraGameObject;
             animator = GetComponent<Animator>();
             environmentScanner = GetComponent<EnvironmentScanner>();
             characterController = GetComponent<CharacterController>();
