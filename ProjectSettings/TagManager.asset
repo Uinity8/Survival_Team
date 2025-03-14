@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CinemachineTarget
   - Hitbox
+  - HousingObject
   layers:
   - Default
   - TransparentFX

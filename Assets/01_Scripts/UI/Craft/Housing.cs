@@ -15,6 +15,7 @@ public class Housing : MonoBehaviour
     public Material green;
 
     bool createdPreview = false;
+    bool isBuildable = true;
 
     void Start()
     {
@@ -63,9 +64,29 @@ public class Housing : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(0))
         {
+            if(isBuildable)
+            {
             Instantiate(itemPrefab, hit.point, Quaternion.identity, this.gameObject.transform);
             previewGreen.gameObject.SetActive(false); // 나중에는 아이템 데이터 받아오니까 디스트로이 후 null 초기화하기
             createdPreview = false;
+            }
+        }
+    }
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!collision.gameObject.CompareTag("HousingObject"))
+        {
+            isBuildable = false;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (!collision.gameObject.CompareTag("HousingObject"))
+        {
+            isBuildable = true;;
         }
     }
 
