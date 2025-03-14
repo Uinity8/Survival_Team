@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/03_Prefabs/Temp.meta
 guid: b9d410d3d9f69410d8de900e0f1ba920
+========
+guid: 533632280ff48420f947f8bf4f008d46
+>>>>>>>> Dev:Assets/05_Animations.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

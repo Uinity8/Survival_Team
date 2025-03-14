@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/04_Animator.meta
 guid: 9ea5ede73127a4711a4f45b39cf68c3f
+========
+guid: 8eabfd80ae38d724e8b845566dd120c8
+>>>>>>>> Dev:Assets/99_External/Fantacode Studios.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

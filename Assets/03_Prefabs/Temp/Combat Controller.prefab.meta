@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/03_Prefabs/Temp/Combat Controller.prefab.meta
 guid: d193ad19194a343e282a1ffff0b8f478
+========
+guid: 063e4efacdba4aa4c8469039120c7ef3
+>>>>>>>> Dev:Assets/99_External/Fantacode Studios/Melee Combat System/Character/FBX/Character Variant.prefab.meta
 PrefabImporter:
   externalObjects: {}
   userData: 
