@@ -206,10 +206,7 @@ namespace _01_Scripts.Third_Person_Controller
                 // customSettings가 없으면 현재 플레이어 상태에 따른 카메라 설정 재정의 확인
                 var currPlayerState = SystemToCameraState(playerController.CurrentSystemState);
                 var overrideSettings = overrideCameraSettings.FirstOrDefault(x => x.state == currPlayerState);
-                if (overrideSettings != null)
-                    settings = overrideSettings.settings;
-                else
-                    settings = defaultSettings;
+                settings = overrideSettings != null ? overrideSettings.settings : defaultSettings;
             }
         }
 
@@ -260,10 +257,7 @@ namespace _01_Scripts.Third_Person_Controller
             else if (currentState != currPlayerState)
             {
                 var overrideSettings = overrideCameraSettings.FirstOrDefault(x => x.state == currPlayerState);
-                if (overrideSettings != null)
-                    settings = overrideSettings.settings;
-                else
-                    settings = defaultSettings;
+                settings = overrideSettings != null ? overrideSettings.settings : defaultSettings;
             }
             // 현재 카메라 상태 업데이트
             currentState = currPlayerState;
@@ -319,7 +313,7 @@ namespace _01_Scripts.Third_Person_Controller
             if (CameraShakeDuration > 0)
             {
                 // 현재 follow 위치에 랜덤한 구형 벡터를 추가해 흔들림 효과 구현
-                currentFollowPos += Random.insideUnitSphere * CurrentCameraShakeAmount * cameraShakeAmount * Mathf.Clamp01(CameraShakeDuration);
+                currentFollowPos += Random.insideUnitSphere * (CurrentCameraShakeAmount * cameraShakeAmount * Mathf.Clamp01(CameraShakeDuration));
                 // 시간에 따라 흔들림 지속시간 감소
                 CameraShakeDuration -= Time.deltaTime;
             }
@@ -346,17 +340,16 @@ namespace _01_Scripts.Third_Person_Controller
             if (settings.enableCameraCollisions)
             {
                 // 충돌 체크를 위해 RaycastHit 변수 선언
-                RaycastHit hit;
                 // 초기 가까운 거리 설정 (기본 카메라 거리)
                 float closestDistance = settings.distance;
 
                 // nearPlanePoints의 중앙값을 초기화
                 nearPlanePoints[4] = Vector3.zero;
                 // nearPlanePoints 리스트의 각 점에 대해 Raycast 수행하여 충돌 여부 체크
-                for (int i = 0; i < nearPlanePoints.Count; i++)
+                foreach (var point in nearPlanePoints)
                 {
                     // focusPosition에서 해당 nearPlanePoint 방향으로 레이캐스트 수행
-                    if (Physics.Raycast(focusPosition, (transform.TransformPoint(nearPlanePoints[i]) - focusPosition), out hit, settings.distance, collisionLayers))
+                    if (Physics.Raycast(focusPosition, (transform.TransformPoint(point) - focusPosition), out var hit, settings.distance, collisionLayers))
                     {
                         // 충돌한 거리 중 가장 가까운 거리를 저장
                         if (hit.distance < closestDistance)
@@ -381,10 +374,9 @@ namespace _01_Scripts.Third_Person_Controller
             else
             {
                 // 만약 충돌로 인해 거리가 조절되면, 별도의 부드러운 시간이 설정되어 있으면 적용
-                if (distanceSmoothTimeWhenOcluded > Mathf.Epsilon)
-                    currDistance = Mathf.SmoothDamp(currDistance, targetDistance, ref distSmoothVel, distanceSmoothTimeWhenOcluded);
-                else
-                    currDistance = targetDistance;
+                currDistance = distanceSmoothTimeWhenOcluded > Mathf.Epsilon
+                    ? Mathf.SmoothDamp(currDistance, targetDistance, ref distSmoothVel, distanceSmoothTimeWhenOcluded)
+                    : targetDistance;
             }
 
             // ─────────────────────────────────────────────────────────
@@ -394,7 +386,7 @@ namespace _01_Scripts.Third_Person_Controller
             transform.position = focusPosition - targetRotation * new Vector3(0, 0, currDistance);
             transform.rotation = targetRotation;
             // 프레이밍 오프셋의 X 성분을 거리 비율에 맞게 추가 (좌우 오프셋)
-            transform.position += transform.right * currFramingOffset.x * currDistance / settings.distance;
+            transform.position += transform.right * (currFramingOffset.x * currDistance) / settings.distance;
 
             // ─────────────────────────────────────────────────────────
             // 카메라 반동 효과 적용 (총 지속시간 동안 회복)

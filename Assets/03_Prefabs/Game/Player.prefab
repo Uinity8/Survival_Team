@@ -3111,7 +3111,7 @@ MonoBehaviour:
   acceleration: 8
   deceleration: 6
   enableSprint: 1
-  setDefaultStateToRunning: 1
+  setDefaultStateToRunning: 0
   useMultiDirectionalAnimation: 0
   playerDirectionBlend: 1
   faceCameraForwardWhenIdle: 0
@@ -3135,8 +3135,8 @@ MonoBehaviour:
   QuickTurnThreshhold: -0.01
   playQuickStopAnimation: 0
   runToStopThreshhold: 0.4
-  groundCheckRadius: 0.2
-  groundCheckOffset: {x: 0, y: 0.15, z: 0.07}
+  groundCheckOffset: -0.14
+  groundCheckRadius: 0.28
   groundLayer:
     serializedVersion: 2
     m_Bits: 1
@@ -3155,16 +3155,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5986c4576a54fceb2a9eb850b34eb8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpKey: 32
-  dropKey: 101
-  moveType: 9
-  sprintKey: 304
-  interactionKey: 101
-  jumpButton: 
-  dropButton: 
-  moveTypeButton: 
-  sprintButton: 
-  interactionButton: 
 --- !u!114 &153238913475489002
 MonoBehaviour:
   m_ObjectHideFlags: 0
