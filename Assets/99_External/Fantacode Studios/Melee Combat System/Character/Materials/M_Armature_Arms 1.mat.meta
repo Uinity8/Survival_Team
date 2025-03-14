@@ -2,8 +2,8 @@ fileFormatVersion: 2
 <<<<<<<< HEAD:Assets/99_External/Fantacode Studios/Melee Combat System/Character/Materials/M_Armature_Arms 1.mat.meta
 guid: 2e2c7708864824345b11ec04d91c2125
 ========
-guid: 26ac90a5c5b58764a9d0097a45de138b
->>>>>>>> Dev:Assets/99_External/Fantacode Studios/Melee Combat System/Character/Materials/Armature_Body_AlbedoTransparency.mat.meta
+guid: c8f794bda8a18c84ea47b289dd5323a6
+>>>>>>>> Dev:Assets/99_External/Fantacode Studios/Melee Combat System/Character/Materials/M_Armature_Body.mat.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000

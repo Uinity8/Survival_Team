@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using _01_Scripts.Input;
 using _01_Scripts.System;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -22,35 +23,35 @@ namespace _01_Scripts.Third_Person_Controller
         [Tooltip("따라갈 대상 Transform (예: 플레이어)")]
         public Transform followTarget;
 
-        [Tooltip("카메라의 기본 설정. 플레이어 상태에 따라 이 설정을 재정의할 수 있음.")]
-        [SerializeField] CameraSettings defaultSettings;
+        [Tooltip("카메라의 기본 설정. 플레이어 상태에 따라 이 설정을 재정의할 수 있음.")] [SerializeField]
+        CameraSettings defaultSettings;
 
-        [Tooltip("켜져있으면 플레이어가 좌우로 이동할 때 카메라가 회전함.")]
-        [SerializeField] bool advancedCameraRotation = true;
+        [Tooltip("켜져있으면 플레이어가 좌우로 이동할 때 카메라가 회전함.")] [SerializeField]
+        bool advancedCameraRotation = true;
 
-        [Tooltip("충돌 체크할 레이어들")]
-        [SerializeField] LayerMask collisionLayers = 1;
+        [Tooltip("충돌 체크할 레이어들")] [SerializeField]
+        LayerMask collisionLayers = 1;
 
-        [Tooltip("플레이 모드 시작 전에 설정해야 합니다. 게임 실행 중에는 변경할 수 없음.")]
-        [SerializeField] bool lockCursor = true;
+        [Tooltip("플레이 모드 시작 전에 설정해야 합니다. 게임 실행 중에는 변경할 수 없음.")] [SerializeField]
+        bool lockCursor = true;
 
-        [Tooltip("카메라 거리 변경 시 적용할 부드러운 시간")]
-        [SerializeField] float distanceSmoothTime = 0.3f;
-        
-        [Tooltip("충돌로 인해 카메라 거리가 변경될 때 적용할 부드러운 시간")]
-        [SerializeField] float distanceSmoothTimeWhenOccluded = 0f;
+        [Tooltip("카메라 거리 변경 시 적용할 부드러운 시간")] [SerializeField]
+        float distanceSmoothTime = 0.3f;
 
-        [Tooltip("프레이밍 오프셋 변경 시 적용할 부드러운 시간")]
-        [SerializeField] float framingSmoothTime = 0.5f;
+        [Tooltip("충돌로 인해 카메라 거리가 변경될 때 적용할 부드러운 시간")] [SerializeField]
+        float distanceSmoothTimeWhenOccluded = 0f;
+
+        [Tooltip("프레이밍 오프셋 변경 시 적용할 부드러운 시간")] [SerializeField]
+        float framingSmoothTime = 0.5f;
 
         // 카메라 충돌 시 여분의 공간(padding) 값
         [SerializeField] float collisionPadding = 0.05f;
 
-        [Tooltip("플레이어의 상태에 따라 카메라 설정을 재정의할 때 사용할 설정 목록")]
-        [SerializeField] List<OverrideSettings> overrideCameraSettings;
+        [Tooltip("플레이어의 상태에 따라 카메라 설정을 재정의할 때 사용할 설정 목록")] [SerializeField]
+        List<OverrideSettings> overrideCameraSettings;
 
-        [Tooltip("플레이 모드 시작 전에 설정해야 합니다. 게임 실행 중에는 변경할 수 없음.")]
-        [SerializeField] float nearClipPlane = 0.1f;
+        [Tooltip("플레이 모드 시작 전에 설정해야 합니다. 게임 실행 중에는 변경할 수 없음.")] [SerializeField]
+        float nearClipPlane = 0.1f;
 
         // 카메라 흔들림 효과의 기본 배율 값
         private const float cameraShakeAmount = 0.6f;
@@ -62,26 +63,33 @@ namespace _01_Scripts.Third_Person_Controller
 
         // 현재 사용 중인 카메라 설정 (기본 설정 또는 재정의된 설정)
         CameraSettings settings;
+
         // 플레이어가 재정의한 카메라 설정 (없으면 null)
         CameraSettings customSettings;
 
         // 현재 카메라 상태 (CameraState 열거형, 예: Locomotion, Combat 등)
         CameraState currentState;
+
         // 현재 따라가고 있는 위치 (부드러운 이동을 위해 사용)
         Vector3 currentFollowPos;
+
         // 목표 카메라 거리와 현재 카메라 거리 (충돌 처리 및 부드러운 보간에 사용)
-        float targetDistance, currDistance;
+        float targetDistance, curDistance;
+
         // 목표 프레이밍 오프셋과 현재 프레이밍 오프셋 (카메라 프레이밍 보정에 사용)
-        Vector3 targetFramingOffset, currFramingOffset;
+        Vector3 targetFramingOffset, curFramingOffset;
 
         // 거리 보간에 사용되는 속도 변수
         float distSmoothVel = 0f;
+
         // 프레이밍과 팔로우 보간에 사용되는 벡터 속도 변수
         Vector3 framingSmoothVel, followSmoothVel = Vector3.zero;
 
         // 카메라 회전 관련 변수 (X축: 상하, Y축: 좌우)
         float rotationX;
+
         float rotationY;
+
         // 보조 회전 값 (Lerp 처리를 위한 Y값 보관)
         float yRot;
 
@@ -93,9 +101,9 @@ namespace _01_Scripts.Third_Person_Controller
         // [참조 변수들: 컴포넌트, 입력 관리자, 플레이어 컨트롤러 등]
         // ─────────────────────────────────────────────────────────────
 
-        Camera _camera;                              // 카메라 컴포넌트
-        PlayerController playerController;          // 플레이어 컨트롤러
-        LocomotionController locomotionController;  // 플레이어 이동 컨트롤러
+        Camera _camera; // 카메라 컴포넌트
+        PlayerController playerController; // 플레이어 컨트롤러
+        LocomotionController locomotionController; // 플레이어 이동 컨트롤러
         private LocomotionInputManager input;
 
         // ─────────────────────────────────────────────────────────────
@@ -107,7 +115,7 @@ namespace _01_Scripts.Third_Person_Controller
             _camera = GetComponent<Camera>();
             // 카메라의 nearClipPlane 값을 지정 (카메라에서 볼 수 있는 최소 거리)
             _camera.nearClipPlane = nearClipPlane;
-            
+
             // followTarget의 부모 객체에서 PlayerController 컴포넌트를 가져옴
             playerController = followTarget.GetComponentInParent<PlayerController>();
             // PlayerController에서 LocomotionController 컴포넌트를 가져옴
@@ -127,7 +135,6 @@ namespace _01_Scripts.Third_Person_Controller
             playerController.SetCustomCameraState += SetCustomCameraState;
             // 카메라 반동 효과 이벤트 등록
             playerController.CameraRecoil += CameraRecoil;
-            
         }
 
 
@@ -149,9 +156,9 @@ namespace _01_Scripts.Third_Person_Controller
             // 기본 카메라 설정 적용
             settings = defaultSettings;
             // 현재 카메라 거리를 기본 설정의 거리로 초기화
-            currDistance = settings.distance;
+            curDistance = settings.distance;
             // 현재 프레이밍 오프셋을 기본 설정의 프레이밍 오프셋으로 초기화
-            currFramingOffset = settings.framingOffset;
+            curFramingOffset = settings.framingOffset;
 
             // 카메라의 near clip plane 상의 포인트 계산 (충돌 체크용)
             CalculateNearPlanePoints();
@@ -176,11 +183,11 @@ namespace _01_Scripts.Third_Person_Controller
             float x = y * _camera.aspect + collisionPadding;
 
             // 네 모서리와 중앙(0,0,0) 포인트를 리스트에 추가
-            nearPlanePoints.Add(new Vector3(x, y, z));     // 우측 상단
-            nearPlanePoints.Add(new Vector3(-x, y, z));    // 좌측 상단
-            nearPlanePoints.Add(new Vector3(x, -y, z));    // 우측 하단
-            nearPlanePoints.Add(new Vector3(-x, -y, z));   // 좌측 하단
-            nearPlanePoints.Add(Vector3.zero);             // 중앙 (추가 용도)
+            nearPlanePoints.Add(new Vector3(x, y, z)); // 우측 상단
+            nearPlanePoints.Add(new Vector3(-x, y, z)); // 좌측 상단
+            nearPlanePoints.Add(new Vector3(x, -y, z)); // 우측 하단
+            nearPlanePoints.Add(new Vector3(-x, -y, z)); // 좌측 하단
+            nearPlanePoints.Add(Vector3.zero); // 중앙 (추가 용도)
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -215,7 +222,8 @@ namespace _01_Scripts.Third_Person_Controller
         // ─────────────────────────────────────────────────────────────
         // 전역 카메라 반동 효과 관련 정보 (랜덤 반동 및 지속시간 처리)
         // ─────────────────────────────────────────────────────────────
-        PlayerController.RecoilInfo GlobalRecoilInfo { get; set; } = new PlayerController.RecoilInfo() { CameraRecoilDuration = 0 };
+        PlayerController.RecoilInfo GlobalRecoilInfo { get; set; } =
+            new PlayerController.RecoilInfo() { CameraRecoilDuration = 0 };
 
         // 카메라 반동 효과의 전체 지속 시간을 저장하는 프로퍼티
         public float CameraTotalRecoilDuration { get; private set; }
@@ -234,8 +242,10 @@ namespace _01_Scripts.Third_Person_Controller
             if (recoilInfo.minRecoilAmount != Vector2.zero)
             {
                 GlobalRecoilInfo.CameraRecoilAmount.x = Mathf.Sign(GlobalRecoilInfo.CameraRecoilAmount.x) *
-                    Mathf.Max(Mathf.Abs(GlobalRecoilInfo.CameraRecoilAmount.x), recoilInfo.minRecoilAmount.x);
-                GlobalRecoilInfo.CameraRecoilAmount.y = Mathf.Max(Mathf.Abs(GlobalRecoilInfo.CameraRecoilAmount.y), recoilInfo.minRecoilAmount.y);
+                                                        Mathf.Max(Mathf.Abs(GlobalRecoilInfo.CameraRecoilAmount.x),
+                                                            recoilInfo.minRecoilAmount.x);
+                GlobalRecoilInfo.CameraRecoilAmount.y = Mathf.Max(Mathf.Abs(GlobalRecoilInfo.CameraRecoilAmount.y),
+                    recoilInfo.minRecoilAmount.y);
             }
 
             // 전체 반동 지속시간 설정
@@ -261,6 +271,7 @@ namespace _01_Scripts.Third_Person_Controller
                 var overrideSettings = overrideCameraSettings.FirstOrDefault(x => x.state == curPlayerState);
                 settings = overrideSettings != null ? overrideSettings.settings : defaultSettings;
             }
+
             // 현재 카메라 상태 업데이트
             currentState = curPlayerState;
 
@@ -297,11 +308,13 @@ namespace _01_Scripts.Third_Person_Controller
                 // 없으면 advancedCameraRotation 옵션에 따라 부드러운 보간 적용
                 if (input.CameraInput != Vector2.zero)
                     yRot = rotationY += input.CameraInput.x * invertXVal * settings.sensitivity;
-                else if (advancedCameraRotation && playerController.CurrentSystemState == SystemState.Locomotion && input.CameraInput.x == 0 && input.DirectionInput.y > -.4f)
+                else if (advancedCameraRotation && playerController.CurrentSystemState == SystemState.Locomotion &&
+                         input.CameraInput.x == 0 && input.DirectionInput.y > -.4f)
                 {
                     StartCoroutine(CameraRotDelay());
                     rotationY = Mathf.Lerp(rotationY, yRot, Time.deltaTime * 25);
                 }
+
                 // 최종 목표 회전 값 계산
                 targetRotation = Quaternion.Euler(rotationX, rotationY, 0);
             }
@@ -309,13 +322,15 @@ namespace _01_Scripts.Third_Person_Controller
             // ─────────────────────────────────────────────────────────
             // 플레이어의 이동에 따른 카메라 위치 보간 처리
             // ─────────────────────────────────────────────────────────
-            currentFollowPos = Vector3.SmoothDamp(currentFollowPos, curFollowTarget.position, ref followSmoothVel, settings.followSmoothTime);
+            currentFollowPos = Vector3.SmoothDamp(currentFollowPos, curFollowTarget.position, ref followSmoothVel,
+                settings.followSmoothTime);
 
             // 카메라 흔들림 효과 적용 (CameraShakeDuration이 남아있는 동안)
             if (CameraShakeDuration > 0)
             {
                 // 현재 follow 위치에 랜덤한 구형 벡터를 추가해 흔들림 효과 구현
-                currentFollowPos += Random.insideUnitSphere * (CurrentCameraShakeAmount * cameraShakeAmount * Mathf.Clamp01(CameraShakeDuration));
+                currentFollowPos += Random.insideUnitSphere *
+                                    (CurrentCameraShakeAmount * cameraShakeAmount * Mathf.Clamp01(CameraShakeDuration));
                 // 시간에 따라 흔들림 지속시간 감소
                 CameraShakeDuration -= Time.deltaTime;
             }
@@ -324,7 +339,8 @@ namespace _01_Scripts.Third_Person_Controller
             // 프레이밍(화면 구도) 보정 처리: 목표 프레이밍 오프셋과 보간 처리
             // ─────────────────────────────────────────────────────────
             targetFramingOffset = settings.framingOffset;
-            currFramingOffset = Vector3.SmoothDamp(currFramingOffset, targetFramingOffset, ref framingSmoothVel, framingSmoothTime);
+            curFramingOffset = Vector3.SmoothDamp(curFramingOffset, targetFramingOffset, ref framingSmoothVel,
+                framingSmoothTime);
 
             // ─────────────────────────────────────────────────────────
             // 카메라 충돌 체크 및 거리 조절
@@ -336,7 +352,7 @@ namespace _01_Scripts.Third_Person_Controller
             //var right = targetRotation * Vector3.right;
 
             // focusPosition: 카메라가 주시할 위치 (플레이어 위치 + 프레이밍 오프셋)
-            var focusPosition = currentFollowPos + Vector3.up * currFramingOffset.y + forward * currFramingOffset.z;
+            var focusPosition = currentFollowPos + Vector3.up * curFramingOffset.y + forward * curFramingOffset.z;
 
             bool collisionAdjusted = false;
             if (settings.enableCameraCollisions)
@@ -351,7 +367,8 @@ namespace _01_Scripts.Third_Person_Controller
                 foreach (var point in nearPlanePoints)
                 {
                     // focusPosition에서 해당 nearPlanePoint 방향으로 레이캐스트 수행
-                    if (Physics.Raycast(focusPosition, (transform.TransformPoint(point) - focusPosition), out var hit, settings.distance, collisionLayers))
+                    if (Physics.Raycast(focusPosition, (transform.TransformPoint(point) - focusPosition), out var hit,
+                            settings.distance, collisionLayers))
                     {
                         // 충돌한 거리 중 가장 가까운 거리를 저장
                         if (hit.distance < closestDistance)
@@ -371,12 +388,12 @@ namespace _01_Scripts.Third_Person_Controller
 
             // 카메라 거리를 부드럽게 보간하여 업데이트
             if (!collisionAdjusted)
-                currDistance = Mathf.SmoothDamp(currDistance, targetDistance, ref distSmoothVel, distanceSmoothTime);
+                curDistance = Mathf.SmoothDamp(curDistance, targetDistance, ref distSmoothVel, distanceSmoothTime);
             else
             {
                 // 만약 충돌로 인해 거리가 조절되면, 별도의 부드러운 시간이 설정되어 있으면 적용
-                currDistance = distanceSmoothTimeWhenOccluded > Mathf.Epsilon
-                    ? Mathf.SmoothDamp(currDistance, targetDistance, ref distSmoothVel, distanceSmoothTimeWhenOccluded)
+                curDistance = distanceSmoothTimeWhenOccluded > Mathf.Epsilon
+                    ? Mathf.SmoothDamp(curDistance, targetDistance, ref distSmoothVel, distanceSmoothTimeWhenOccluded)
                     : targetDistance;
             }
 
@@ -384,10 +401,10 @@ namespace _01_Scripts.Third_Person_Controller
             // 최종 카메라 위치와 회전 설정
             // ─────────────────────────────────────────────────────────
             // focusPosition에서 targetRotation 방향의 뒤쪽으로 currDistance만큼 떨어진 위치 계산
-            transform.position = focusPosition - targetRotation * new Vector3(0, 0, currDistance);
+            transform.position = focusPosition - targetRotation * new Vector3(0, 0, curDistance);
             transform.rotation = targetRotation;
             // 프레이밍 오프셋의 X 성분을 거리 비율에 맞게 추가 (좌우 오프셋)
-            transform.position += transform.right * (currFramingOffset.x * currDistance) / settings.distance;
+            transform.position += transform.right * (curFramingOffset.x * curDistance) / settings.distance;
 
             // ─────────────────────────────────────────────────────────
             // 카메라 반동 효과 적용 (총 지속시간 동안 회복)
@@ -400,13 +417,15 @@ namespace _01_Scripts.Third_Person_Controller
                 // 반동 진행 단계에 따라 초기 반동과 회복 단계로 나눠서 처리
                 if (normalizedTime <= GlobalRecoilInfo.recoilPhasePercentage)
                 {
-                    recoilProgress = Time.deltaTime / (CameraTotalRecoilDuration * GlobalRecoilInfo.recoilPhasePercentage);
+                    recoilProgress = Time.deltaTime /
+                                     (CameraTotalRecoilDuration * GlobalRecoilInfo.recoilPhasePercentage);
                     rotationY += GlobalRecoilInfo.CameraRecoilAmount.x * recoilProgress;
                     rotationX -= GlobalRecoilInfo.CameraRecoilAmount.y * recoilProgress;
                 }
                 else
                 {
-                    recoilProgress = Time.deltaTime / (CameraTotalRecoilDuration * (1 - GlobalRecoilInfo.recoilPhasePercentage));
+                    recoilProgress = Time.deltaTime /
+                                     (CameraTotalRecoilDuration * (1 - GlobalRecoilInfo.recoilPhasePercentage));
                     rotationY -= GlobalRecoilInfo.CameraRecoilAmount.x * recoilProgress;
                     rotationX += GlobalRecoilInfo.CameraRecoilAmount.y * recoilProgress;
                 }
@@ -414,6 +433,7 @@ namespace _01_Scripts.Third_Person_Controller
                 // 반동 지속시간 감소
                 GlobalRecoilInfo.CameraRecoilDuration -= Time.deltaTime;
             }
+
             // 이전 followTarget의 위치를 저장 (카메라 회전 보간에 사용)
             previousPos = curFollowTarget.transform.position;
         }
@@ -487,10 +507,13 @@ namespace _01_Scripts.Third_Person_Controller
     {
         // 따라갈 대상 (카메라 오프셋 등)
         public Transform followTarget;
+
         // 기본 카메라 거리
         public float distance = 2.5f;
+
         // 카메라 프레이밍 오프셋 (예: 플레이어 위쪽, 앞쪽 등)
         public Vector3 framingOffset = new Vector3(0, 1.5f, 0);
+
         // 따라가는 움직임의 부드러운 시간
         public float followSmoothTime = 0.2f;
 
@@ -498,8 +521,7 @@ namespace _01_Scripts.Third_Person_Controller
         public Vector2 localRotationOffset;
 
         // 카메라 회전 민감도 (0~1 사이 값)
-        [Range(0, 1)]
-        public float sensitivity = 0.6f;
+        [Range(0, 1)] public float sensitivity = 0.6f;
 
         // 상하 회전 최소/최대 각도 제한
         public float minVerticalAngle = -45;
@@ -514,8 +536,8 @@ namespace _01_Scripts.Third_Person_Controller
         public float minDistanceFromTarget = 0.2f;
 
         // 직렬화 관련 변수 (에디터에서 한 번만 기본값 적용)
-        [SerializeField, HideInInspector]
-        private bool serialized = false;
+        [SerializeField, HideInInspector] private bool serialized = false;
+
         public void OnAfterDeserialize()
         {
             if (serialized == false)
@@ -552,6 +574,7 @@ namespace _01_Scripts.Third_Person_Controller
     {
         // 재정의할 카메라 상태 (CameraState 열거형)
         public CameraState state;
+
         // 해당 상태에서 적용할 카메라 설정
         public CameraSettings settings;
     }
@@ -562,13 +585,13 @@ namespace _01_Scripts.Third_Person_Controller
     // ─────────────────────────────────────────────────────────────
     public enum CameraState
     {
-        Locomotion,      // 기본 이동 상태
-        Parkour,         // 파쿠르 상태
-        Climbing,        // 등반 상태
-        Combat,          // 전투 상태
-        GrapplingHook,   // 그래플링 훅 상태
-        Swing,           // 그네 또는 줄타기 상태
-        Other,           // 기타 상태
-        Crouching,       // 웅크린 상태 (Locomotion 상태에서 웅크림 여부에 따라 구분)
+        Locomotion, // 기본 이동 상태
+        Parkour, // 파쿠르 상태
+        Climbing, // 등반 상태
+        Combat, // 전투 상태
+        GrapplingHook, // 그래플링 훅 상태
+        Swing, // 그네 또는 줄타기 상태
+        Other, // 기타 상태
+        Crouching, // 웅크린 상태 (Locomotion 상태에서 웅크림 여부에 따라 구분)
     }
 }
