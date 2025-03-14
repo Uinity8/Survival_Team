@@ -76,14 +76,20 @@ namespace Framework.Audio
         /// <summary>
         /// SFX 재생
         /// </summary>
-        /// <param name="clip">재생할 효과음 클립</param>
-        public static void PlaySFX(AudioClip clip)
+        /// <param name="clip">재생할 클립</param>
+        /// <param name="position">재생할 위치</param>
+        /// <param name="volume">볼륨 기본값 1</param>
+        public static void PlaySFX(AudioClip clip, Vector3 position, float volume = 1f)
         {
             if (Instance.isMuted || !clip) return;
 
-            SoundSource obj = Instantiate(Instance.soundSourcePrefab); // 새로운 사운드 소스 오브젝트 생성
-            SoundSource soundSource = obj.GetComponent<SoundSource>(); // 사운드 소스 가져오기
-            soundSource.Play(clip, Instance.sfxVolume, Instance.sfxPitchVariance); // 효과음 재생
+            // SoundSource obj = Instantiate(Instance.soundSourcePrefab); // 새로운 사운드 소스 오브젝트 생성
+            // SoundSource soundSource = obj.GetComponent<SoundSource>(); // 사운드 소스 가져오기
+            // soundSource.Play(clip, Instance.sfxVolume, Instance.sfxPitchVariance); // 효과음 재생
+            
+            volume = Mathf.Clamp01(volume / Instance.sfxVolume); // 설정된 효과음 볼륨의 비례
+            
+            AudioSource.PlayClipAtPoint(clip, position, volume);
         }
 
         /// <summary>

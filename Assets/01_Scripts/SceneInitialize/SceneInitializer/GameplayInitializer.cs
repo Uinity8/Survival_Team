@@ -1,6 +1,5 @@
 using _01_Scripts.UI;
 using Managers;
-using Scripts.UI;
 using UnityEngine;
 
 namespace Framework
