@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class Condition : MonoBehaviour
 {
-    //UIÀ» ¿¬°áÇØ¼­ º¸¿©ÁÖ´Â°÷ View
+    //UIì„ ì—°ê²°í•´ì„œ ë³´ì—¬ì£¼ëŠ”ê³³ View
     public Image healthBar;
     public Image hungerBar;
     public Image thirstBar;
@@ -18,17 +18,20 @@ public class Condition : MonoBehaviour
 
     private void Start()
     {
-        /* Ä³¸¯ÅÍ ¸Å´ÏÁ®°¡ »ı¼º½Ã ÁÖ¼® ÇØÁ¦
+        Managers.SignalManager.Instance.ConnectSignal<float>("test", Value => UpdateProgressbar(hungerBar, Value, 100f)) ;
+
+
+        /* ìºë¦­í„° ë§¤ë‹ˆì ¸ê°€ ìƒì„±ì‹œ ì£¼ì„ í•´ì œ
         characterController = CharacterManager.Player.conditionsController;
 
-        characterController.conditionHandler.PropertyChanged += OnConditionChanged; // µ¨¸®°ÔÀÌÆ®¿¡¼­ += ´Â µ¨¸®°ÔÀÌÆ® ¾È¿¡ÀÖ´Â ÇÔ¼ö¶û °°ÀÌ ½ÇÇà½ÃÅ²´Ù´Â°Í
+        characterController.conditionHandler.PropertyChanged += OnConditionChanged; // ë¸ë¦¬ê²Œì´íŠ¸ì—ì„œ += ëŠ” ë¸ë¦¬ê²Œì´íŠ¸ ì•ˆì—ìˆëŠ” í•¨ìˆ˜ë‘ ê°™ì´ ì‹¤í–‰ì‹œí‚¨ë‹¤ëŠ”ê²ƒ
         UpdateAllBars();
         */
     }
 
     private void OnConditionChanged(object sender, PropertyChangedEventArgs args)
     {
-        /* Ä³¸¯ÅÍ ¸Å´ÏÁ®°¡ »ı¼º½Ã ÁÖ¼® ÇØÁ¦
+        /* ìºë¦­í„° ë§¤ë‹ˆì ¸ê°€ ìƒì„±ì‹œ ì£¼ì„ í•´ì œ
         switch (args.PropertyName)
         {
             case nameof(characterController.Health):
@@ -49,7 +52,7 @@ public class Condition : MonoBehaviour
 
     public void UpdateProgressbar(Image image, float curValue, float maxValue)
     {
-        // maxValue°¡ 0ÀÏ °æ¿ì fillAmount¸¦ 0À¸·Î ¼³Á¤ÇÏ¿© ³ª´°¼ÀÀ» ¹æÁö
+        // maxValueê°€ 0ì¼ ê²½ìš° fillAmountë¥¼ 0ìœ¼ë¡œ ì„¤ì •í•˜ì—¬ ë‚˜ëˆ—ì…ˆì„ ë°©ì§€
         if (maxValue == 0)
         {
             image.fillAmount = 0;
@@ -59,9 +62,9 @@ public class Condition : MonoBehaviour
         image.fillAmount = Mathf.Clamp01(curValue / maxValue);
     }
 
-    private void UpdateAllBars()// Ã¼·Â¹Ù ÃÊ±âÈ­
+    private void UpdateAllBars()// ì²´ë ¥ë°” ì´ˆê¸°í™”
     {
-        /* Ä³¸¯ÅÍ ¸Å´ÏÁ®°¡ »ı¼º½Ã ÁÖ¼® ÇØÁ¦
+        /* ìºë¦­í„° ë§¤ë‹ˆì ¸ê°€ ìƒì„±ì‹œ ì£¼ì„ í•´ì œ
         UpdateProgressbar(healthBar, characterController.Health.Value, characterController.Health.MaxValue);
         UpdateProgressbar(hungerBar, characterController.Hunger.Value, characterController.Hunger.MaxValue);
         UpdateProgressbar(thirstBar, characterController.Thirst.Value, characterController.Thirst.MaxValue);

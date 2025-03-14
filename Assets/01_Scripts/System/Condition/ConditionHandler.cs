@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
 using static UnityEngine.Rendering.DebugUI;
 
-public class ConditionHandler : INotifyPropertyChanged //INotifyPropertyChanged,IDamagable ³ÖÀ» ¿¹Á¤
+public class ConditionHandler : INotifyPropertyChanged //INotifyPropertyChanged,IDamagable ë„£ì„ ì˜ˆì •
 {
-    //º¯È­ ÇÒ °ªÀ» ÃÖ¼Ò ÃÖ´ë°ª¿¡ ºñ·ÊÇØ¼­ ¼öÁ¤µÚ ui ¿¡°Ô Á¤º¸ Àü´Ş¸¸ ÇÏ±â
+    //ë³€í™” í•  ê°’ì„ ìµœì†Œ ìµœëŒ€ê°’ì— ë¹„ë¡€í•´ì„œ ìˆ˜ì •ë’¤ ui ì—ê²Œ ì •ë³´ ì „ë‹¬ë§Œ í•˜ê¸°
 
     private float _value;
     public float MaxValue { get; private set; }
@@ -20,28 +20,31 @@ public class ConditionHandler : INotifyPropertyChanged //INotifyPropertyChanged,
         {
             if (_value == value) return;
 
-            Value = value;
+            _value = value;
             if (_value < 0) _value = 0;
             if (_value > MaxValue) _value = MaxValue;
             OnPropertyChanged(nameof(Value));
+
+            Managers.SignalManager.Instance.EmitSignal("test", Value);
         }
     }
 
 
-    public event PropertyChangedEventHandler PropertyChanged;//µ¨¸®°ÔÀÌÆ®
+    public event PropertyChangedEventHandler PropertyChanged;//ë¸ë¦¬ê²Œì´íŠ¸
 
-    public ConditionHandler(float maxValue) //°ÔÀÓ ½ÃÀÛ½Ã °ßµğ¼Ç°ª ÃÖ´ë·Î
+    public ConditionHandler(float maxValue) //ê²Œì„ ì‹œì‘ì‹œ ê²¬ë””ì…˜ê°’ ìµœëŒ€ë¡œ
     {
         MaxValue = maxValue;
         _value = maxValue; 
     }
 
-    protected virtual void OnPropertyChanged(string propertyName) // ui ¿¡°Ô Á¤º¸¸¦ º¸³×´Â°÷ ¸¶´Ù È£Ãâ
+    protected virtual void OnPropertyChanged(string propertyName) // ui ì—ê²Œ ì •ë³´ë¥¼ ë³´ë„¤ëŠ”ê³³ ë§ˆë‹¤ í˜¸ì¶œ
     {
+
         //this = ConditionHander
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        //sender(this) = ConditionHander ÀÚ½Å ÀÎ½ºÅÏ½º
-        //args(ÀÌ¸§, °ª)
+        //sender(this) = ConditionHander ìì‹  ì¸ìŠ¤í„´ìŠ¤
+        //args(ì´ë¦„, ê°’)
     }
 
     

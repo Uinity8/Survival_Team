@@ -6,7 +6,7 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class ConditionsController : MonoBehaviour // IDamagable
 {
-    //¿©±â¼­ ÄÁµğ¼ÇÀÇ ¿¬»ê
+    //ì—¬ê¸°ì„œ ì»¨ë””ì…˜ì˜ ì—°ì‚°
     public ConditionHandler Health { get; private set; }
     public ConditionHandler Hunger { get; private set; }
     public ConditionHandler Thirst { get; private set; }
@@ -22,8 +22,8 @@ public class ConditionsController : MonoBehaviour // IDamagable
 
     private void Start()
     {
-        InvokeRepeating("OnHungry", 5f, 5f);//¹è°íÇÄ Áö¼Ó °¨¼Ò 
-        InvokeRepeating("OnThirst", 5f, 5f);//¸ñ¸¶¸§ Áö¼Ó °¨¼Ò
+        InvokeRepeating("OnHungry", 5f, 5f);//ë°°ê³ í”” ì§€ì† ê°ì†Œ 
+        InvokeRepeating("OnThirst", 5f, 5f);//ëª©ë§ˆë¦„ ì§€ì† ê°ì†Œ
     }
 
     private void Update()
@@ -32,16 +32,16 @@ public class ConditionsController : MonoBehaviour // IDamagable
     }
 
     /// <summary>
-    /// À½½Ä ¸ÔÀ»¶§ ½ÇÇà
+    /// ìŒì‹ ë¨¹ì„ë•Œ ì‹¤í–‰
     /// </summary>
     /// <param name="value"></param>
-    public void Eat(float value)//¾ÆÀÌÅÛ µ¥ÀÌÅÍÀÇ°ªÀ» ¹Ş¾Æ¼­ ½ÇÇà
+    public void Eat(float value)//ì•„ì´í…œ ë°ì´í„°ì˜ê°’ì„ ë°›ì•„ì„œ ì‹¤í–‰
     {
         Health.Value += value;
     }
 
     /// <summary>
-    /// À½·á ¸¶½Ç¶§ ½ÇÇà
+    /// ìŒë£Œ ë§ˆì‹¤ë•Œ ì‹¤í–‰
     /// </summary>
     /// <param name="value"></param>
     public void Drink(float value)
@@ -50,7 +50,7 @@ public class ConditionsController : MonoBehaviour // IDamagable
     }
 
     /// <summary>
-    /// Ã¼·Â Æ÷¼Ç »ç¿ëÇÒ¶§
+    /// ì²´ë ¥ í¬ì…˜ ì‚¬ìš©í• ë•Œ
     /// </summary>
     /// <param name="value"></param>
     public void Heal(float value)
@@ -62,7 +62,7 @@ public class ConditionsController : MonoBehaviour // IDamagable
     }
 
     /// <summary>
-    /// Ä³¸¯ÅÍ°¡ Á×À»¶§
+    /// ìºë¦­í„°ê°€ ì£½ì„ë•Œ
     /// </summary>
     /// <param name="value"></param>
     public void Die(float value)
@@ -74,14 +74,17 @@ public class ConditionsController : MonoBehaviour // IDamagable
         }
     }
     /// <summary>
-    /// ÄÁµğ¼Ç Áö¼Ó °¨¼Ò
+    /// ì»¨ë””ì…˜ ì§€ì† ê°ì†Œ
     /// </summary>
-    #region ¹İº¹ ½ÇÇà ÇÔ¼ö
+    #region ë°˜ë³µ ì‹¤í–‰ í•¨ìˆ˜
     void OnHungry()
     {
         if (Hunger.Value > 0)
         {
+            Debug.Log(Hunger.Value);
+
             Hunger.Value -= 10f;
+            Debug.Log(Hunger.Value);
         }
     }
 
