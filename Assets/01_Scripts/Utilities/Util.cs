@@ -1,4 +1,7 @@
+using System;
+using System.Collections;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DefaultNamespace
 {
@@ -42,13 +45,29 @@ namespace DefaultNamespace
 
             return null;
         }
-        
-        
+
+
         public static float ClampAngle(float lfAngle, float lfMin, float lfMax)
         {
             if (lfAngle < -360f) lfAngle += 360f;
             if (lfAngle > 360f) lfAngle -= 360f;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
+        }
+
+
+        public static IEnumerator RunAfterFrames(int numOfFrames, Action action)
+        {
+            for (int i = 0; i < numOfFrames; i++)
+                yield return null;
+
+            action.Invoke();
+        }
+
+        public static IEnumerator RunAfterDelay(float delay, Action action)
+        {
+            yield return new WaitForSeconds(delay);
+
+            action.Invoke();
         }
     }
 }

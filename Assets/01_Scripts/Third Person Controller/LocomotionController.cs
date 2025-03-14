@@ -3,9 +3,10 @@ using System.Collections;
 using System.Linq;
 using _01_Scripts.Input;
 using _01_Scripts.System;
+using AnimatorHash;
 using UnityEngine;
 
-namespace _01_Scripts.Third_Person_Controller
+namespace AnimatorHash
 {
     public static partial class AnimatorParameters
     {
@@ -20,6 +21,11 @@ namespace _01_Scripts.Third_Person_Controller
         public static readonly int RunToStopAmount = Animator.StringToHash("RunToStopAmount"); // 정지 동작(러닝에서 멈출 때)
         public static readonly int LocomotionType = Animator.StringToHash("locomotionType"); // 로코모션 타입
     }
+
+}
+
+namespace _01_Scripts.Third_Person_Controller
+{
 
     public class LocomotionController : SystemBase, ICharacter, IDamageable
     {

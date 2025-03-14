@@ -8,11 +8,11 @@ namespace FS_ThirdPerson
         public virtual void HandleStart() { }
         public virtual void HandleFixedUpdate() { }
         public virtual void HandleUpdate() { }
-        public virtual void HandleOnAnimatorMove(Animator animator)
+        public virtual void HandleOnAnimatorMove(Animator anim)
         {
-            if (animator.deltaPosition != Vector3.zero)
-                transform.position += animator.deltaPosition;
-            transform.rotation *= animator.deltaRotation;
+            if (anim.deltaPosition != Vector3.zero)
+                transform.position += anim.deltaPosition;
+            transform.rotation *= anim.deltaRotation;
         }
         /// <summary>
         /// priority based on higher number

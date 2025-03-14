@@ -216,16 +216,12 @@ namespace FS_CombatSystem
 
         public Vector3 GetTargetingDir()
         {
-            if (!CombatMode)
-            {
-                var vecFromCam = transform.position - Camera.main.transform.position;
-                vecFromCam.y = 0f;
-                return vecFromCam.normalized;
-            }
-            else
-            {
-                return transform.forward;
-            }
+            if (CombatMode) return transform.forward;
+            if (!Camera.main) return transform.forward;
+            var vecFromCam = transform.position - Camera.main.transform.position;
+            vecFromCam.y = 0f;
+            return vecFromCam.normalized;
+
         }
 
 
@@ -353,15 +349,15 @@ namespace FS_CombatSystem
             }
         }
 
-        public override void HandleOnAnimatorMove(Animator animator)
+        public override void HandleOnAnimatorMove(Animator anim)
         {
             if (player.UseRootMotion && !meleeFighter.StopMovement)
             {
                 //if (meleeFighter.IsDead)
                 //    Debug.Log("Using root motion for death - Matching target - " + meleeFighter.IsMatchingTarget);
-                transform.rotation *= animator.deltaRotation;
+                transform.rotation *= anim.deltaRotation;
 
-                var deltaPos = animator.deltaPosition;
+                var deltaPos = anim.deltaPosition;
 
                 if (meleeFighter.IsMatchingTarget)
                     deltaPos = meleeFighter.MatchingTargetDeltaPos;

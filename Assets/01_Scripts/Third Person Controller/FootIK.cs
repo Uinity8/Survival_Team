@@ -1,16 +1,22 @@
 using _01_Scripts.System;
+using AnimatorHash;
 using UnityEngine;
 
-namespace _01_Scripts.Third_Person_Controller
+namespace AnimatorHash
 {
-    // AnimatorParameters 클래스의 일부로서, 애니메이터 파라미터를 해시값으로 미리 계산하여 저장합니다.
+// AnimatorParameters 클래스의 일부로서, 애니메이터 파라미터를 해시값으로 미리 계산하여 저장합니다.
     public static partial class AnimatorParameters
     {
         // 좌측 발 IK 관련 파라미터
         public static readonly int LeftFootIK = Animator.StringToHash("leftFootIK");
+
         // 우측 발 IK 관련 파라미터
         public static readonly int RightFootIK = Animator.StringToHash("rightFootIK");
     }
+}
+
+namespace _01_Scripts.Third_Person_Controller
+{
 
     /// <summary>
     /// FootIK 클래스
