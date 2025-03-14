@@ -7,9 +7,9 @@ namespace Managers
 {
     public class InputManager : Singleton<InputManager>
     {
-        private PlayerInputActions _playerInput;
+        private PlayerInputAction _playerInput;
 
-        public InputActionMap Player => _playerInput.Player;
+        public InputActionMap Player => _playerInput.LocoMotion;
 
         public event Action<Vector2> OnMoveInput;
         public event Action<Vector2> OnLookInput;
@@ -24,7 +24,7 @@ namespace Managers
         protected override void Awake()
         {
             base.Awake();
-            _playerInput = new PlayerInputActions();
+            _playerInput = new PlayerInputAction();
         }
 
         private void Start()
@@ -34,38 +34,39 @@ namespace Managers
 
         private void InitializeInputs()
         {
-            _playerInput = new PlayerInputActions();
-
-            _playerInput.Player.Move.performed += ctx => OnMoveInput?.Invoke(ctx.ReadValue<Vector2>());
-            _playerInput.Player.Move.canceled += ctx => OnMoveInput?.Invoke(ctx.ReadValue<Vector2>());
-            _playerInput.Player.Look.performed += ctx => OnLookInput?.Invoke(ctx.ReadValue<Vector2>());
-            _playerInput.Player.Look.canceled += ctx => OnLookInput?.Invoke(ctx.ReadValue<Vector2>());
-            _playerInput.Player.Jump.started += _ => OnJumpPressed?.Invoke(true);
-            _playerInput.Player.Jump.canceled += _ => OnJumpPressed?.Invoke(false);
-            _playerInput.Player.Interaction.started += _ => OnInteractionPressed?.Invoke();
-            _playerInput.Player.Attack.started += _ => OnAttackPressed?.Invoke();
-            _playerInput.Player.Dash.started += _ => OnDashInput?.Invoke(true);
-            _playerInput.Player.Dash.canceled += _ => OnDashInput?.Invoke(false);
-            _playerInput.Player.Zoom.performed += ctx => OnZoomInput?.Invoke(ctx.ReadValue<float>());
+            _playerInput.LocoMotion.Move.performed += ctx => OnMoveInput?.Invoke(ctx.ReadValue<Vector2>());
+            _playerInput.LocoMotion.Move.canceled += ctx => OnMoveInput?.Invoke(ctx.ReadValue<Vector2>());
+            _playerInput.Camera.Look.performed += ctx => OnLookInput?.Invoke(ctx.ReadValue<Vector2>());
+            _playerInput.Camera.Look.canceled += ctx => OnLookInput?.Invoke(ctx.ReadValue<Vector2>());
+            _playerInput.LocoMotion.Jump.started += _ => OnJumpPressed?.Invoke(true);
+            _playerInput.LocoMotion.Jump.canceled += _ => OnJumpPressed?.Invoke(false);
+            _playerInput.LocoMotion.Interaction.started += _ => OnInteractionPressed?.Invoke();
+            _playerInput.Combat.Attack.started += _ => OnAttackPressed?.Invoke();
+            _playerInput.LocoMotion.Sprint.started += _ => OnDashInput?.Invoke(true);
+            _playerInput.LocoMotion.Sprint.canceled += _ => OnDashInput?.Invoke(false);
+            _playerInput.Camera.Zoom.performed += ctx => OnZoomInput?.Invoke(ctx.ReadValue<float>());
 
             _playerInput.Shorcut.Inventory.started += _ =>OnInventoryPressed?.Invoke();
             
-            _playerInput.Player.Enable();
+            _playerInput.LocoMotion.Enable();
             _playerInput.Shorcut.Enable();
+            _playerInput.Camera.Enable();
         }
 
         private void OnEnable()
         {
             if (_playerInput == null) return;
-            _playerInput.Player.Enable();
+            _playerInput.LocoMotion.Enable();
             _playerInput.Shorcut.Enable();
+            _playerInput.Camera.Enable();
         }
 
         private void OnDisable()
         {
             if (_playerInput == null) return;
-            _playerInput.Player.Disable();
+            _playerInput.LocoMotion.Disable();
             _playerInput.Shorcut.Disable();
+            _playerInput.Camera.Disable();
         }
         
         
