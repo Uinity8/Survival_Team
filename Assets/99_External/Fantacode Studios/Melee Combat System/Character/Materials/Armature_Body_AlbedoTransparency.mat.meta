@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/99_External/Fantacode Studios/Melee Combat System/Character/Materials/Armature_Body_AlbedoTransparency.mat.meta
 guid: 26ac90a5c5b58764a9d0097a45de138b
+========
+guid: de740f4195b1fdf47a9bd7955273ef3a
+>>>>>>>> Dev:Assets/99_External/Fantacode Studios/Melee Combat System/Character/Materials/Armature_Body_AlbedoTransparency 1.mat.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
