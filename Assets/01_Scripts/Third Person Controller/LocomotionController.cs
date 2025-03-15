@@ -265,8 +265,7 @@ namespace _01_Scripts.Third_Person_Controller
                 }
             }
         }
-
-
+        
         public override void HandleUpdate()
         {
             // 이동이 제한되었거나 루트 모션이 활성화된 경우, ySpeed를 줄이고 종료
@@ -325,7 +324,7 @@ namespace _01_Scripts.Third_Person_Controller
                 // 속도 계산 (걷기, 달리기, 스프린트)
                 moveSpeed = targetSpeed;
 
-                var curSpeedDir = currentSpeed; //현재 이동방향은 현재 스피드?
+                var curSpeedDir = currentSpeed; //현재 이동방향
                 curSpeedDir.y = 0; //수직값은 제거
 
                 var sprintDir = Vector3.Dot(curSpeedDir.normalized, transform.forward); // 앞쪽 방향과 얼마나 일치하는지 
@@ -624,6 +623,8 @@ namespace _01_Scripts.Third_Person_Controller
                 rotationValue = Mathf.Sign(rotDiff.y) * .5f;
             }
 
+            Debug.Log(rotationValue);
+            
             // 애니메이션 컨트롤러에 회전 값을 전달
             animator.SetFloat(AnimatorParameters.Rotation, rotationValue, 0.35f, Time.deltaTime);
 

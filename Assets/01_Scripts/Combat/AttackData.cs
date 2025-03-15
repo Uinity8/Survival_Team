@@ -7,7 +7,7 @@ using UnityEngine;
 namespace _01_Scripts.Combat
 {
     [CustomIcon(FolderPath.CombatIcons + "Attack Icon.png")]
-    [CreateAssetMenu(menuName = "Combat System/Create Attack")]
+    [CreateAssetMenu(menuName = "Combat/Create Attack")]
     public class AttackData : ScriptableObject
     {
         [Tooltip("The animation clip associated with this attack.")]

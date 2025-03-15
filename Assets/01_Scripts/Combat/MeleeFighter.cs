@@ -43,77 +43,73 @@ namespace _01_Scripts.Combat
         // 전투 상태를 나타내는 bool 값입니다. true면 이동이 멈춥니다.
         public bool StopMovement { get; set; }
 
-// 기본 무기. 전투 시작 시 사용할 무기
-        [Tooltip("전투 시작 시 사용하는 기본 무기")] public WeaponData weapon;
-
-// 최대 체력 값. 초기 값으로 25f를 설정
+        
+        [Tooltip("전투 시작 시 사용하는 기본 무기")]
+        public WeaponData weapon;
+        
         [field: SerializeField]
         [Tooltip("캐릭터의 최대 체력 (초기값: 25)")]
         public float MaxHealth { get; private set; } = 25f;
 
-// 공격 중 회전 속도
+        // 공격 중 회전 속도
         [SerializeField] [Tooltip("공격 중 캐릭터의 회전 속도")]
         private float rotationSpeedDuringAttack = 500f;
 
-// 추가적인 선택적 매개변수
+        // 추가적인 선택적 매개변수
         [Header("Optional Parameters")] [Tooltip("기본 반응 애니메이션 세트")]
         public DefaultReactions defaultAnimations = new DefaultReactions();
 
-// 캐릭터에 부착된 무기 리스트
+        // 캐릭터에 부착된 무기 리스트
         [SerializeField] [Tooltip("전투 중 캐릭터에 장착된 무기 리스트")]
         private List<AttachedWeapon> attachedWeapons = new List<AttachedWeapon>();
 
-// 현재 체력 값입니다. MaxHealth와의 비율을 통해 체력 상태를 나타냅니다.
-        [Tooltip("현재 체력 값")] public float CurrentHealth { get; private set; }
+        // 현재 체력 값입니다. MaxHealth와의 비율을 통해 체력 상태를 나타냅니다.
+        public float CurrentHealth { get; private set; }
 
-// 전투의 최대 공격 범위. 자동 계산됨.
-        [Tooltip("전투 중 최대 공격 범위 (자동 계산됩니다).")] public float MaxAttackRange { get; private set; }
+        // 전투의 최대 공격 범위. 자동 계산됨.
+        public float MaxAttackRange { get; private set; }
 
-// 전투기의 현재 상태를 나타냅니다.
-        [Tooltip("현재 전투 상태")] public FighterState State { get; private set; }
+        
+        [Tooltip("현재 전투 상태")]
+        public FighterState State { get; private set; }
 
-// 전투기의 공격 상태를 나타냅니다.
+        // 전투기의 공격 상태를 나타냅니다.
         [Tooltip("현재 공격 상태")] public AttackStates AttackState { get; private set; }
 
-// 캐릭터가 행동 중인지 나타냅니다. (Idle, None, Blocking 상태가 아니면 true)
-        [Tooltip("캐릭터가 작업(공격 등) 중인지 여부")]
+        // 캐릭터가 행동 중인지 나타냅니다. (Idle, None, Blocking 상태가 아니면 true)
         public bool InAction => State != FighterState.None && State != FighterState.Blocking;
 
-// 캐릭터가 사망했는지 확인합니다.
-        [Tooltip("캐릭터가 사망 상태인지 여부")] public bool IsDead => State == FighterState.Dead;
+        // 캐릭터가 사망했는지 확인합니다.
+        public bool IsDead => State == FighterState.Dead;
 
-// 캐릭터가 작업 중이거나 사망 상태인지 확인합니다.
-        [Tooltip("캐릭터가 작업 또는 사망 상태인지 여부")] public bool IsBusy => InAction || IsDead;
+        // 캐릭터가 작업 중이거나 사망 상태인지 확인합니다.
+        public bool IsBusy => InAction || IsDead;
 
-// 캐릭터가 '기절 상태'에 있는지 확인합니다.
-        [Tooltip("'기절(KnockedDown)' 상태 여부")]
+        // 캐릭터가 '기절 상태'에 있는지 확인합니다.
         public bool IsKnockedDown => State == FighterState.KnockedDown ||
                                      (State == FighterState.TakingHit && prevState == FighterState.KnockedDown);
 
-// 카운터 공격이 가능한지 여부를 나타냅니다.
-        [Tooltip("캐릭터가 카운터 공격을 할 수 있는 상태인지 여부")]
+        // 카운터 공격이 가능한지 여부를 나타냅니다.
         public bool IsCountable => AttackState == AttackStates.Windup &&
                                    (!CombatSettings.Instance.OnlyCounterFirstAttackOfCombo || comboCount == 0);
 
-// 목표에 매칭 중인지 확인합니다.
-        [Tooltip("현재 목표에 맞춰 캐릭터 상태가 동기화 중인지 여부")]
-        public bool IsMatchingTarget { get; private set; } = false;
+        // 목표에 매칭 중인지 확인합니다.
+        public bool IsMatchingTarget { get; private set; }
 
-// 현재 동기화된 애니메이션 상태인지 확인 (다른 공격 중간 삽입 방지)
-        [Tooltip("현재 동기화된 애니메이션 상태인지 여부")] public bool IsInSyncedAnimation { get; private set; } = false;
+        // 현재 동기화된 애니메이션 상태인지 확인 (다른 공격 중간 삽입 방지)
+         public bool IsInSyncedAnimation { get; private set; }
 
-// 현재 동기화된 동작 데이터를 저장합니다.
-        [Tooltip("현재 동기화된 행동 데이터")] public AttackData CurrSyncedAction { get; private set; } // 중복 행동 방지용
+        // 현재 동기화된 동작 데이터를 저장합니다.
+        public AttackData CurrSyncedAction { get; private set; } // 중복 행동 방지용
 
-// 외부로부터 공격을 받을 수 있는지 여부
-        [Tooltip("공격을 받을 수 있는지 여부")] public bool CanTakeHit { get; set; } = true;
+        // 외부로부터 공격을 받을 수 있는지 여부
+        public bool CanTakeHit { get; set; } = true;
 
-// 무적 상태 여부
-        [Tooltip("현재 캐릭터의 무적 상태 여부 (true면 데미지를 받지 않습니다).")]
-        public bool IsInvincible { get; set; } = false;
+        // 무적 상태 여부
+        public bool IsInvincible { get; set; }
 
-// 블로킹 여부 관리
-        [Tooltip("공격을 방어 중인지 여부")] private bool isBlocking;
+        // 블로킹 여부 관리
+         private bool isBlocking;
 
         public bool IsBlocking
         {
@@ -128,77 +124,77 @@ namespace _01_Scripts.Combat
         }
 
         // 현재 공격 대상으로 설정된 전투 상대입니다.
-        [Tooltip("현재 설정된 공격 대상")] public MeleeFighter Target { get; set; }
+        public MeleeFighter Target { get; set; }
 
-// 현재 공격 중인 대상을 나타냅니다 (내부 전용).
-        [Tooltip("현재 공격 중인 대상 (내부 전용)")] private MeleeFighter attackingTarget;
+        // 현재 공격 중인 대상을 나타냅니다.
+        private MeleeFighter attackingTarget;
 
-// 공격받고 있는 상태인지 여부를 확인합니다.
-        [Tooltip("현재 캐릭터가 공격받고 있는지 여부")] public bool IsBeingAttacked { get; private set; } = false;
+        // 공격받고 있는 상태인지 여부를 확인합니다.
+        public bool IsBeingAttacked { get; private set; } = false;
 
-// 현재 캐릭터를 공격 중인 상대를 나타냅니다.
-        [Tooltip("현재 이 캐릭터를 공격 중인 상대")] public MeleeFighter CurrAttacker { get; private set; }
+        // 현재 캐릭터를 공격 중인 상대를 나타냅니다.
+        public MeleeFighter CurrAttacker { get; private set; }
 
-// 현재 장착된 무기를 나타냅니다.
-        [Tooltip("현재 장착 중인 무기 데이터")] public WeaponData CurrentWeapon { get; set; }
+        // 현재 장착된 무기를 나타냅니다.
+        public WeaponData CurrentWeapon { get; set; }
 
-// 현재 장착된 무기의 게임 오브젝트를 참조합니다.
-        [Tooltip("현재 장착 중인 무기의 게임 오브젝트")] public GameObject CurrentWeaponObject { get; set; }
+        // 현재 장착된 무기의 게임 오브젝트를 참조합니다.
+        public GameObject CurrentWeaponObject { get; set; }
 
-// 장착된 무기를 다루는 핸들러를 참조합니다.
-        [Tooltip("현재 장착 중인 무기를 다루는 무기 핸들러")] public AttachedWeapon CurrentWeaponHandler { get; set; }
+        // 장착된 무기를 다루는 핸들러를 참조합니다.
+        public AttachedWeapon CurrentWeaponHandler { get; set; }
 
-// 현재 목표와의 위치 차이를 나타냅니다.
-        [Tooltip("현재 목표와의 위치 차이")] public Vector3 MatchingTargetDeltaPos { get; private set; } = Vector3.zero;
+        // 현재 목표와의 위치 차이를 나타냅니다.
+        public Vector3 MatchingTargetDeltaPos { get; private set; } = Vector3.zero;
 
-// 캡슐형 충돌체를 나타냅니다 (캐릭터용 충돌 처리).
+        // 캡슐형 충돌체를 나타냅니다 (캐릭터용 충돌 처리).
         [SerializeField] [Tooltip("캐릭터의 기본 캡슐 충돌체")]
         private CapsuleCollider capsuleCollider;
 
-// 무기 충돌체를 나타냅니다.
+        // 무기 충돌체를 나타냅니다.
         [SerializeField] [Tooltip("무기를 위한 박스 충돌체")]
         private BoxCollider weaponCollider;
 
-// 신체 부위별 충돌체를 나타냅니다 (손, 발, 팔꿈치, 무릎, 머리 등).
+        // 신체 부위별 충돌체를 나타냅니다 (손, 발, 팔꿈치, 무릎, 머리 등).
         [SerializeField] [Tooltip("왼손 충돌체")] private BoxCollider leftHandCollider, rightHandCollider;
         [SerializeField] [Tooltip("양발 충돌체")] private BoxCollider leftFootCollider, rightFootCollider;
         [SerializeField] [Tooltip("팔꿈치 충돌체")] private BoxCollider leftElbowCollider, rightElbowCollider;
         [SerializeField] [Tooltip("무릎 충돌체")] private BoxCollider leftKneeCollider, rightKneeCollider;
         [SerializeField] [Tooltip("머리 충돌체")] private BoxCollider headCollider;
 
-// 현재 활성화된 충돌체를 나타냅니다.
+        // 현재 활성화된 충돌체를 나타냅니다.
         [Tooltip("현재 활성 상태의 충돌체")] private BoxCollider activeCollider;
 
-// 이전 충돌체의 위치를 저장합니다.
+        // 이전 충돌체의 위치를 저장합니다.
         [Tooltip("이전 충돌체의 위치")] private Vector3 prevColliderPos;
 
-// 이전에 활성화된 게임 오브젝트를 추적합니다.
+        // 이전에 활성화된 게임 오브젝트를 추적합니다.
         [Tooltip("이전에 활성화된 게임 오브젝트")] private GameObject prevGameObj;
 
-// 애니메이션을 제어하는 Animator 컴포넌트를 참조합니다.
+        // 애니메이션을 제어하는 Animator 컴포넌트를 참조합니다.
         [SerializeField] [Tooltip("Animator 컴포넌트")]
         private Animator animator;
 
-// 애니메이션 그래프를 나타냅니다.
+        // 애니메이션 그래프를 나타냅니다.
         [SerializeField] [Tooltip("애니메이션 그래프 관리")]
         private AnimGraph animGraph;
 
-// 기본 애니메이터 컨트롤러를 참조합니다.
+        // 기본 애니메이터 컨트롤러를 참조합니다.
         [SerializeField] [Tooltip("기본 애니메이터 컨트롤러")]
         private AnimatorOverrideController defaultAnimatorController;
 
-// 캐릭터 움직임을 제어하는 CharacterController를 참조합니다.
+        // 캐릭터 움직임을 제어하는 CharacterController를 참조합니다.
         [SerializeField] [Tooltip("캐릭터 움직임 제어 컴포넌트")]
         private CharacterController characterController;
 
-// 현재 콤보 상태를 나타냅니다.
-        [Tooltip("현재 캐릭터가 콤보 상태인지 여부")] private bool doCombo;
+        // 현재 콤보 중인지.
+        private bool doCombo;
 
-// 현재 콤보 횟수를 저장합니다.
-        [Tooltip("현재 콤보 진행 횟수")] private int comboCount;
+        // 현재 콤보 횟수를 저장합니다.
+         private int comboCount;
 
-// 캐릭터에게 적이 때린 횟수를 저장합니다.
-        [Tooltip("공격을 받은 횟수")] private int hitCount;
+        // 캐릭터에게 적이 때린 횟수를 저장합니다.
+        private int hitCount;
 
         // 공격자가 회피할 수 있는지 나타냄
         [Tooltip("Indicates if the fighter can dodge.")] [HideInInspector]
@@ -208,18 +204,18 @@ namespace _01_Scripts.Combat
         [HideInInspector] public DodgeData dodgeData;
 
         // 전투 모드에서만 회피 가능 여부를 나타냄
-        [Tooltip("If true, fighter will only be able to dodge in combat mode.")] [HideInInspector]
+        [Tooltip("If true, fighter will only be able to dodge in combat mode.")]
         public bool OnlyDodgeInCombatMode = true;
 
         // 공격자가 구르기 동작을 할 수 있는지 나타냄
-        [Tooltip("Indicates if the fighter can roll.")] [HideInInspector]
+        [Tooltip("Indicates if the fighter can roll.")]
         public bool CanRoll;
 
         // 구르기 동작 데이터를 저장
         [HideInInspector] public DodgeData rollData;
 
         // 전투 모드에서만 구르기가 가능한지 여부를 나타냄
-        [Tooltip("If true, fighter will only be able to roll in combat mode.")] [HideInInspector]
+        [Tooltip("If true, fighter will only be able to roll in combat mode.")] 
         public bool OnlyRollInCombatMode = true;
 
         [Space(10)]

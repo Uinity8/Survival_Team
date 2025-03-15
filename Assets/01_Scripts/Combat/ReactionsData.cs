@@ -6,7 +6,7 @@ using UnityEngine;
 namespace _01_Scripts.Combat
 {
     [CustomIcon(FolderPath.CombatIcons + "Reaction Icon.png")]
-    [CreateAssetMenu(menuName = "Combat System/Create Reactions")]
+    [CreateAssetMenu(menuName = "Combat/Create Reactions")]
     public class ReactionsData : ScriptableObject
     {
         [Tooltip("List of reactions for handling different reactions.")]
